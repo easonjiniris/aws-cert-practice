@@ -56,6 +56,7 @@ export function ExamPage() {
   const startedAtRef = useRef<number>(Date.now());
   const startedIsoRef = useRef<string>(new Date().toISOString());
   const submittedRef = useRef(false);
+  const sentinelPushedRef = useRef(false);
 
   useEffect(() => {
     const certId = params.certId;
@@ -115,6 +116,41 @@ export function ExamPage() {
       }
     })();
   }, [params.certId, params.version]);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    if (!sentinelPushedRef.current) {
+      window.history.pushState({ examGuard: true }, "");
+      sentinelPushedRef.current = true;
+    }
+
+    const onPopState = () => {
+      if (submittedRef.current) return;
+      const ok = window.confirm(
+        "Leave the exam? Your progress on this attempt will be lost."
+      );
+      if (ok) {
+        window.removeEventListener("popstate", onPopState);
+        setTimeout(() => window.history.back(), 0);
+      } else {
+        window.history.pushState({ examGuard: true }, "");
+      }
+    };
+
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (submittedRef.current) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("popstate", onPopState);
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+    };
+  }, [loaded]);
 
   const toggleSelection = (questionId: string, optionId: string, isMulti: boolean) => {
     setSelections((prev) => {
@@ -195,7 +231,7 @@ export function ExamPage() {
       try {
         await api.submitAttempt(attempt);
         sessionStorage.setItem(`attempt:${attempt.id}`, JSON.stringify(attempt));
-        navigate(`/review/${attempt.id}`);
+        navigate(`/review/${attempt.id}`, { replace: true });
       } catch (e) {
         setError((e as Error).message);
         submittedRef.current = false;
