@@ -10,6 +10,7 @@ export function ExamsListPage() {
   const [selectedCertId, setSelectedCertId] = useState<string>("");
   const [generating, setGenerating] = useState(false);
   const [genMessage, setGenMessage] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const reload = async () => {
     try {
@@ -37,6 +38,7 @@ export function ExamsListPage() {
 
   const generate = async () => {
     if (!selectedCertId) return;
+    setPickerOpen(false);
     setGenerating(true);
     setGenMessage(null);
     try {
@@ -59,28 +61,14 @@ export function ExamsListPage() {
     <div className="mx-auto max-w-6xl p-6">
       <div className="mb-6 flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold text-slate-900">Practice exams</h1>
-        <div className="flex items-center gap-2">
-          <select
-            value={selectedCertId}
-            onChange={(e) => setSelectedCertId(e.target.value)}
-            disabled={generating}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-          >
-            {data.certs.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.code} — {c.name.replace(/^AWS Certified /, "")}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            onClick={generate}
-            disabled={generating || !selectedCertId}
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {generating ? "Generating…" : "Generate new pool"}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
+          disabled={generating}
+          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {generating ? "Generating…" : "Generate new pool"}
+        </button>
       </div>
 
       {generating && (
@@ -91,6 +79,61 @@ export function ExamsListPage() {
       {!generating && genMessage && (
         <div className="mb-4 rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
           {genMessage}
+        </div>
+      )}
+
+      {pickerOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+          onClick={() => setPickerOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-1 text-lg font-semibold text-slate-900">
+              Generate new pool
+            </h2>
+            <p className="mb-4 text-sm text-slate-500">
+              Pick which certification to generate fresh questions for.
+            </p>
+            <label
+              htmlFor="cert-picker"
+              className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500"
+            >
+              Certification
+            </label>
+            <select
+              id="cert-picker"
+              value={selectedCertId}
+              onChange={(e) => setSelectedCertId(e.target.value)}
+              className="mb-5 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+              autoFocus
+            >
+              {data.certs.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.code} — {c.name.replace(/^AWS Certified /, "")}
+                </option>
+              ))}
+            </select>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setPickerOpen(false)}
+                className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={generate}
+                disabled={!selectedCertId}
+                className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Generate
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -133,7 +176,7 @@ function CertCard({ cert }: { cert: CertHomeEntry }) {
       <div className="mb-3">
         {cert.exams.length === 0 ? (
           <div className="rounded border border-dashed border-slate-300 px-3 py-2 text-xs text-slate-500">
-            No pools yet — pick this cert from the dropdown above and click Generate.
+            No pools yet — click Generate new pool above and pick this cert.
           </div>
         ) : (
           <ul className="space-y-1">
