@@ -13,3 +13,5 @@ dist/
 # default to empty), so a fresh clone runs without these present.
 data/attempts.json
 data/certs/*/wrong_questions.json
+data/certs/*/exams/
+data/certs/*/pools/
