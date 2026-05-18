@@ -2,7 +2,10 @@ import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import { ExamsListPage } from "./pages/ExamsListPage";
 import { ExamPage } from "./pages/ExamPage";
 import { ReviewPage } from "./pages/ReviewPage";
-import { WrongQuestionsPage } from "./pages/WrongQuestionsPage";
+import {
+  WrongQuestionsCertPage,
+  WrongQuestionsChooserPage,
+} from "./pages/WrongQuestionsPage";
 import { HistoryPage } from "./pages/HistoryPage";
 
 function Nav() {
@@ -15,8 +18,8 @@ function Nav() {
 
   return (
     <nav className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-5xl items-center gap-2 px-6 py-3">
-        <span className="mr-4 text-sm font-semibold text-slate-900">CCP Practice</span>
+      <div className="mx-auto flex max-w-6xl items-center gap-2 px-6 py-3">
+        <span className="mr-4 text-sm font-semibold text-slate-900">AWS Cert Practice</span>
         <NavLink to="/" end className={tabClass}>
           Exams
         </NavLink>
@@ -37,9 +40,10 @@ export function App() {
       <Nav />
       <Routes>
         <Route path="/" element={<ExamsListPage />} />
-        <Route path="/exam/:version" element={<ExamPage />} />
+        <Route path="/exam/:certId/:version" element={<ExamPage />} />
         <Route path="/review/:attemptId" element={<ReviewPage />} />
-        <Route path="/wrong" element={<WrongQuestionsPage />} />
+        <Route path="/wrong" element={<WrongQuestionsChooserPage />} />
+        <Route path="/wrong/:certId" element={<WrongQuestionsCertPage />} />
         <Route path="/history" element={<HistoryPage />} />
       </Routes>
     </BrowserRouter>

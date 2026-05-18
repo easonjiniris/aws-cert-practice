@@ -1,15 +1,16 @@
 {
+  "cert_id": "ccp",
   "version": 2,
   "created_at": "2026-05-18T04:16:47.432Z",
   "domain_weights": {
     "cloud_concepts": 0.24,
-    "security": 0.3,
-    "technology": 0.34,
-    "billing_pricing": 0.12
+    "security_compliance": 0.3,
+    "cloud_technology": 0.34,
+    "billing_pricing_support": 0.12
   },
   "questions": [
     {
-      "id": "v2-q001",
+      "id": "ccp-v2-q001",
       "domain": "cloud_concepts",
       "difficulty": "easy",
       "type": "multiple_choice",
@@ -41,7 +42,7 @@
       ]
     },
     {
-      "id": "v2-q002",
+      "id": "ccp-v2-q002",
       "domain": "cloud_concepts",
       "difficulty": "easy",
       "type": "multiple_choice",
@@ -73,7 +74,7 @@
       ]
     },
     {
-      "id": "v2-q003",
+      "id": "ccp-v2-q003",
       "domain": "cloud_concepts",
       "difficulty": "easy",
       "type": "multiple_choice",
@@ -105,7 +106,7 @@
       ]
     },
     {
-      "id": "v2-q004",
+      "id": "ccp-v2-q004",
       "domain": "cloud_concepts",
       "difficulty": "easy",
       "type": "multiple_choice",
@@ -137,7 +138,7 @@
       ]
     },
     {
-      "id": "v2-q005",
+      "id": "ccp-v2-q005",
       "domain": "cloud_concepts",
       "difficulty": "easy",
       "type": "multiple_choice",
@@ -169,7 +170,7 @@
       ]
     },
     {
-      "id": "v2-q006",
+      "id": "ccp-v2-q006",
       "domain": "cloud_concepts",
       "difficulty": "medium",
       "type": "multiple_choice",
@@ -201,7 +202,7 @@
       ]
     },
     {
-      "id": "v2-q007",
+      "id": "ccp-v2-q007",
       "domain": "cloud_concepts",
       "difficulty": "medium",
       "type": "multiple_choice",
@@ -233,7 +234,7 @@
       ]
     },
     {
-      "id": "v2-q008",
+      "id": "ccp-v2-q008",
       "domain": "cloud_concepts",
       "difficulty": "medium",
       "type": "multiple_choice",
@@ -265,7 +266,7 @@
       ]
     },
     {
-      "id": "v2-q009",
+      "id": "ccp-v2-q009",
       "domain": "cloud_concepts",
       "difficulty": "medium",
       "type": "multiple_choice",
@@ -297,7 +298,7 @@
       ]
     },
     {
-      "id": "v2-q010",
+      "id": "ccp-v2-q010",
       "domain": "cloud_concepts",
       "difficulty": "medium",
       "type": "multiple_choice",
@@ -329,7 +330,7 @@
       ]
     },
     {
-      "id": "v2-q011",
+      "id": "ccp-v2-q011",
       "domain": "cloud_concepts",
       "difficulty": "medium",
       "type": "multiple_choice",
@@ -361,7 +362,7 @@
       ]
     },
     {
-      "id": "v2-q012",
+      "id": "ccp-v2-q012",
       "domain": "cloud_concepts",
       "difficulty": "medium",
       "type": "multiple_choice",
@@ -393,7 +394,7 @@
       ]
     },
     {
-      "id": "v2-q013",
+      "id": "ccp-v2-q013",
       "domain": "cloud_concepts",
       "difficulty": "medium",
       "type": "multiple_choice",
@@ -425,7 +426,7 @@
       ]
     },
     {
-      "id": "v2-q014",
+      "id": "ccp-v2-q014",
       "domain": "cloud_concepts",
       "difficulty": "hard",
       "type": "multiple_choice",
@@ -457,7 +458,7 @@
       ]
     },
     {
-      "id": "v2-q015",
+      "id": "ccp-v2-q015",
       "domain": "cloud_concepts",
       "difficulty": "hard",
       "type": "multiple_response",
@@ -494,7 +495,7 @@
       ]
     },
     {
-      "id": "v2-q016",
+      "id": "ccp-v2-q016",
       "domain": "cloud_concepts",
       "difficulty": "hard",
       "type": "multiple_response",
@@ -530,8 +531,8 @@
       ]
     },
     {
-      "id": "v2-q017",
-      "domain": "security",
+      "id": "ccp-v2-q017",
+      "domain": "security_compliance",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Under the AWS shared responsibility model, which of the following is the customer's responsibility?",
@@ -562,8 +563,8 @@
       ]
     },
     {
-      "id": "v2-q018",
-      "domain": "security",
+      "id": "ccp-v2-q018",
+      "domain": "security_compliance",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which AWS service provides on-demand access to AWS compliance reports such as SOC and ISO certifications?",
@@ -594,8 +595,8 @@
       ]
     },
     {
-      "id": "v2-q019",
-      "domain": "security",
+      "id": "ccp-v2-q019",
+      "domain": "security_compliance",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "What is an AWS best practice for using the AWS account root user?",
@@ -626,8 +627,8 @@
       ]
     },
     {
-      "id": "v2-q020",
-      "domain": "security",
+      "id": "ccp-v2-q020",
+      "domain": "security_compliance",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which AWS service continuously monitors AWS accounts and workloads for malicious activity using threat intelligence and machine learning?",
@@ -658,8 +659,8 @@
       ]
     },
     {
-      "id": "v2-q021",
-      "domain": "security",
+      "id": "ccp-v2-q021",
+      "domain": "security_compliance",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which service provides free public and private SSL/TLS certificates for use with AWS services such as Elastic Load Balancing and Amazon CloudFront?",
@@ -690,8 +691,8 @@
       ]
     },
     {
-      "id": "v2-q022",
-      "domain": "security",
+      "id": "ccp-v2-q022",
+      "domain": "security_compliance",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "What is the primary purpose of an IAM role?",
@@ -722,8 +723,8 @@
       ]
     },
     {
-      "id": "v2-q023",
-      "domain": "security",
+      "id": "ccp-v2-q023",
+      "domain": "security_compliance",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company wants to centrally manage workforce user identities and provide single sign-on (SSO) to multiple AWS accounts in AWS Organizations. Which service should they use?",
@@ -754,8 +755,8 @@
       ]
     },
     {
-      "id": "v2-q024",
-      "domain": "security",
+      "id": "ccp-v2-q024",
+      "domain": "security_compliance",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "Which statement correctly distinguishes a security group from a network ACL (NACL) in an Amazon VPC?",
@@ -786,8 +787,8 @@
       ]
     },
     {
-      "id": "v2-q025",
-      "domain": "security",
+      "id": "ccp-v2-q025",
+      "domain": "security_compliance",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A developer needs to record a history of every API call made in an AWS account for security auditing and post-incident investigation. Which AWS service is most appropriate?",
@@ -818,8 +819,8 @@
       ]
     },
     {
-      "id": "v2-q026",
-      "domain": "security",
+      "id": "ccp-v2-q026",
+      "domain": "security_compliance",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company stores sensitive customer information in Amazon S3 and wants to automatically discover and classify PII across thousands of buckets. Which service should they use?",
@@ -850,8 +851,8 @@
       ]
     },
     {
-      "id": "v2-q027",
-      "domain": "security",
+      "id": "ccp-v2-q027",
+      "domain": "security_compliance",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "Which AWS service should be used to protect web applications from common exploits like SQL injection and cross-site scripting (XSS)?",
@@ -882,8 +883,8 @@
       ]
     },
     {
-      "id": "v2-q028",
-      "domain": "security",
+      "id": "ccp-v2-q028",
+      "domain": "security_compliance",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company needs to securely store database credentials and automatically rotate them on a schedule. Which AWS service is best suited?",
@@ -914,8 +915,8 @@
       ]
     },
     {
-      "id": "v2-q029",
-      "domain": "security",
+      "id": "ccp-v2-q029",
+      "domain": "security_compliance",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A security engineer wants a single dashboard that aggregates findings from GuardDuty, Inspector, and Macie and checks them against industry standards such as CIS AWS Foundations Benchmark. Which service should be used?",
@@ -946,8 +947,8 @@
       ]
     },
     {
-      "id": "v2-q030",
-      "domain": "security",
+      "id": "ccp-v2-q030",
+      "domain": "security_compliance",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "Which AWS service allows you to track resource configuration changes over time and evaluate them against desired configurations or compliance rules?",
@@ -978,8 +979,8 @@
       ]
     },
     {
-      "id": "v2-q031",
-      "domain": "security",
+      "id": "ccp-v2-q031",
+      "domain": "security_compliance",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "An organization wants to allow its corporate Active Directory users to sign in to the AWS Management Console using their existing credentials. Which approach satisfies this requirement?",
@@ -1010,8 +1011,8 @@
       ]
     },
     {
-      "id": "v2-q032",
-      "domain": "security",
+      "id": "ccp-v2-q032",
+      "domain": "security_compliance",
       "difficulty": "hard",
       "type": "multiple_choice",
       "stem": "A regulated customer must store and use their own cryptographic keys on dedicated, single-tenant hardware that is validated to FIPS 140-2 Level 3. Which AWS service meets this requirement?",
@@ -1042,8 +1043,8 @@
       ]
     },
     {
-      "id": "v2-q033",
-      "domain": "security",
+      "id": "ccp-v2-q033",
+      "domain": "security_compliance",
       "difficulty": "hard",
       "type": "multiple_response",
       "stem": "Which of the following are AWS responsibilities under the shared responsibility model? (Choose TWO.)",
@@ -1079,8 +1080,8 @@
       ]
     },
     {
-      "id": "v2-q034",
-      "domain": "security",
+      "id": "ccp-v2-q034",
+      "domain": "security_compliance",
       "difficulty": "hard",
       "type": "multiple_response",
       "stem": "Which statements about AWS Key Management Service (KMS) are correct? (Choose TWO.)",
@@ -1116,8 +1117,8 @@
       ]
     },
     {
-      "id": "v2-q035",
-      "domain": "security",
+      "id": "ccp-v2-q035",
+      "domain": "security_compliance",
       "difficulty": "hard",
       "type": "multiple_response",
       "stem": "Which of the following are recommended IAM best practices? (Choose THREE.)",
@@ -1152,8 +1153,8 @@
       ]
     },
     {
-      "id": "v2-q036",
-      "domain": "technology",
+      "id": "ccp-v2-q036",
+      "domain": "cloud_technology",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which AWS service provides resizable virtual machines in the cloud?",
@@ -1184,8 +1185,8 @@
       ]
     },
     {
-      "id": "v2-q037",
-      "domain": "technology",
+      "id": "ccp-v2-q037",
+      "domain": "cloud_technology",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "A company needs durable, highly available object storage for static website assets such as images and videos. Which AWS service should they use?",
@@ -1216,8 +1217,8 @@
       ]
     },
     {
-      "id": "v2-q038",
-      "domain": "technology",
+      "id": "ccp-v2-q038",
+      "domain": "cloud_technology",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which AWS global infrastructure component is a logically isolated geographic location that contains one or more Availability Zones?",
@@ -1248,8 +1249,8 @@
       ]
     },
     {
-      "id": "v2-q039",
-      "domain": "technology",
+      "id": "ccp-v2-q039",
+      "domain": "cloud_technology",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which AWS service is a fully managed relational database service that supports engines such as MySQL, PostgreSQL, and Oracle?",
@@ -1280,8 +1281,8 @@
       ]
     },
     {
-      "id": "v2-q040",
-      "domain": "technology",
+      "id": "ccp-v2-q040",
+      "domain": "cloud_technology",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which AWS service is used to register and manage domain names and route end-user requests to internet applications?",
@@ -1312,8 +1313,8 @@
       ]
     },
     {
-      "id": "v2-q041",
-      "domain": "technology",
+      "id": "ccp-v2-q041",
+      "domain": "cloud_technology",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which AWS service lets you run code without provisioning or managing servers, charging only for the compute time consumed?",
@@ -1344,8 +1345,8 @@
       ]
     },
     {
-      "id": "v2-q042",
-      "domain": "technology",
+      "id": "ccp-v2-q042",
+      "domain": "cloud_technology",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which AWS service provides a content delivery network (CDN) that caches content at edge locations to deliver it to users with low latency?",
@@ -1376,8 +1377,8 @@
       ]
     },
     {
-      "id": "v2-q043",
-      "domain": "technology",
+      "id": "ccp-v2-q043",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A development team wants to deploy a web application to AWS by simply uploading their code. AWS should automatically handle capacity provisioning, load balancing, and application health monitoring. Which service best meets this requirement?",
@@ -1408,8 +1409,8 @@
       ]
     },
     {
-      "id": "v2-q044",
-      "domain": "technology",
+      "id": "ccp-v2-q044",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company needs an S3 storage class for long-term archival data that is rarely accessed and can tolerate retrieval times of several hours, at the lowest possible cost.",
@@ -1440,8 +1441,8 @@
       ]
     },
     {
-      "id": "v2-q045",
-      "domain": "technology",
+      "id": "ccp-v2-q045",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "Which AWS database service is a fully managed, MySQL- and PostgreSQL-compatible relational database designed for high performance and availability, with storage that automatically scales up to 128 TiB?",
@@ -1472,8 +1473,8 @@
       ]
     },
     {
-      "id": "v2-q046",
-      "domain": "technology",
+      "id": "ccp-v2-q046",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A solution requires decoupling components of a distributed application so that producers can send messages and consumers can process them at their own pace. Which service should be used?",
@@ -1504,8 +1505,8 @@
       ]
     },
     {
-      "id": "v2-q047",
-      "domain": "technology",
+      "id": "ccp-v2-q047",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company wants to run Docker containers on AWS without managing the underlying EC2 instances or servers. Which combination should they use?",
@@ -1536,8 +1537,8 @@
       ]
     },
     {
-      "id": "v2-q048",
-      "domain": "technology",
+      "id": "ccp-v2-q048",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company needs a shared POSIX-compliant file system that can be mounted concurrently from multiple Linux EC2 instances across multiple Availability Zones. Which service should they use?",
@@ -1568,8 +1569,8 @@
       ]
     },
     {
-      "id": "v2-q049",
-      "domain": "technology",
+      "id": "ccp-v2-q049",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "Which AWS service allows you to define your infrastructure as code using JSON or YAML templates so that resources can be provisioned consistently across environments?",
@@ -1600,8 +1601,8 @@
       ]
     },
     {
-      "id": "v2-q050",
-      "domain": "technology",
+      "id": "ccp-v2-q050",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company wants to monitor application performance metrics, collect logs, and set alarms on AWS resources. Which service should they use?",
@@ -1632,8 +1633,8 @@
       ]
     },
     {
-      "id": "v2-q051",
-      "domain": "technology",
+      "id": "ccp-v2-q051",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company needs to migrate 80 TB of data from an on-premises data center to Amazon S3. Internet bandwidth is limited and the transfer must complete within a few weeks. Which AWS service is most appropriate?",
@@ -1664,8 +1665,8 @@
       ]
     },
     {
-      "id": "v2-q052",
-      "domain": "technology",
+      "id": "ccp-v2-q052",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "Which AWS service provides a serverless interactive query service that allows users to analyze data directly in Amazon S3 using standard SQL?",
@@ -1696,8 +1697,8 @@
       ]
     },
     {
-      "id": "v2-q053",
-      "domain": "technology",
+      "id": "ccp-v2-q053",
+      "domain": "cloud_technology",
       "difficulty": "hard",
       "type": "multiple_choice",
       "stem": "A company has VPCs in multiple AWS Regions and several on-premises offices connected via VPN. They want a single hub to interconnect all of these networks at scale, simplifying routing and management. Which service best meets this need?",
@@ -1728,8 +1729,8 @@
       ]
     },
     {
-      "id": "v2-q054",
-      "domain": "technology",
+      "id": "ccp-v2-q054",
+      "domain": "cloud_technology",
       "difficulty": "hard",
       "type": "multiple_choice",
       "stem": "A latency-sensitive global application uses TCP and UDP. The company wants to use static anycast IP addresses and route users to the nearest healthy endpoint via the AWS global network. Which service should they use?",
@@ -1760,8 +1761,8 @@
       ]
     },
     {
-      "id": "v2-q055",
-      "domain": "technology",
+      "id": "ccp-v2-q055",
+      "domain": "cloud_technology",
       "difficulty": "hard",
       "type": "multiple_response",
       "stem": "Which of the following statements about AWS Availability Zones (AZs) are TRUE? (Choose TWO.)",
@@ -1797,8 +1798,8 @@
       ]
     },
     {
-      "id": "v2-q056",
-      "domain": "technology",
+      "id": "ccp-v2-q056",
+      "domain": "cloud_technology",
       "difficulty": "hard",
       "type": "multiple_response",
       "stem": "Which AWS services can be used to deploy or operate resources in AWS? (Choose THREE.)",
@@ -1833,8 +1834,8 @@
       ]
     },
     {
-      "id": "v2-q057",
-      "domain": "technology",
+      "id": "ccp-v2-q057",
+      "domain": "cloud_technology",
       "difficulty": "medium",
       "type": "multiple_response",
       "stem": "Which AWS services are primarily considered application integration services used to connect or coordinate distributed application components? (Choose TWO.)",
@@ -1870,8 +1871,8 @@
       ]
     },
     {
-      "id": "v2-q058",
-      "domain": "billing_pricing",
+      "id": "ccp-v2-q058",
+      "domain": "billing_pricing_support",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "A company wants to receive an alert when its monthly AWS spending is forecasted to exceed $5,000. Which AWS service should the company use?",
@@ -1902,8 +1903,8 @@
       ]
     },
     {
-      "id": "v2-q059",
-      "domain": "billing_pricing",
+      "id": "ccp-v2-q059",
+      "domain": "billing_pricing_support",
       "difficulty": "easy",
       "type": "multiple_choice",
       "stem": "Which AWS Support plan provides 24/7 access to a designated Technical Account Manager (TAM) and a Concierge support team?",
@@ -1934,8 +1935,8 @@
       ]
     },
     {
-      "id": "v2-q060",
-      "domain": "billing_pricing",
+      "id": "ccp-v2-q060",
+      "domain": "billing_pricing_support",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company runs a fault-tolerant batch-processing workload that can be interrupted and resumed without affecting the final result. Which Amazon EC2 purchasing option will provide the LOWEST cost?",
@@ -1966,8 +1967,8 @@
       ]
     },
     {
-      "id": "v2-q061",
-      "domain": "billing_pricing",
+      "id": "ccp-v2-q061",
+      "domain": "billing_pricing_support",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A company has multiple AWS accounts managed under AWS Organizations with consolidated billing enabled. Which of the following is a benefit of this setup?",
@@ -1993,13 +1994,13 @@
           "id": "D",
           "text": "Member accounts can no longer be billed for their own usage and must use the management account's payment method exclusively.",
           "is_correct": false,
-          "reason": "While the management (payer) account does pay the consolidated bill, this is a feature—not a restriction—and chargeback to member accounts is still possible using cost allocation tags."
+          "reason": "While the management (payer) account does pay the consolidated bill, this is a feature\u2014not a restriction\u2014and chargeback to member accounts is still possible using cost allocation tags."
         }
       ]
     },
     {
-      "id": "v2-q062",
-      "domain": "billing_pricing",
+      "id": "ccp-v2-q062",
+      "domain": "billing_pricing_support",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A solutions architect needs to estimate the monthly cost of a new architecture that uses Amazon EC2, Amazon RDS, and Amazon S3 BEFORE deploying any resources. Which AWS tool should be used?",
@@ -2025,13 +2026,13 @@
           "id": "D",
           "text": "AWS Trusted Advisor",
           "is_correct": false,
-          "reason": "Trusted Advisor provides recommendations for cost optimization, security, and performance on existing resources—not pre-deployment pricing estimates."
+          "reason": "Trusted Advisor provides recommendations for cost optimization, security, and performance on existing resources\u2014not pre-deployment pricing estimates."
         }
       ]
     },
     {
-      "id": "v2-q063",
-      "domain": "billing_pricing",
+      "id": "ccp-v2-q063",
+      "domain": "billing_pricing_support",
       "difficulty": "medium",
       "type": "multiple_choice",
       "stem": "A finance team wants to allocate AWS costs to specific departments and projects across the organization. Which feature should they configure to enable this reporting?",
@@ -2062,8 +2063,8 @@
       ]
     },
     {
-      "id": "v2-q064",
-      "domain": "billing_pricing",
+      "id": "ccp-v2-q064",
+      "domain": "billing_pricing_support",
       "difficulty": "hard",
       "type": "multiple_choice",
       "stem": "A company runs steady-state production workloads on Amazon EC2 and wants the maximum discount while retaining flexibility to change instance family, size, OS, tenancy, and Region over a 3-year term. Which purchasing option BEST meets these requirements?",
@@ -2094,8 +2095,8 @@
       ]
     },
     {
-      "id": "v2-q065",
-      "domain": "billing_pricing",
+      "id": "ccp-v2-q065",
+      "domain": "billing_pricing_support",
       "difficulty": "hard",
       "type": "multiple_response",
       "stem": "Which of the following capabilities are included with the AWS Business Support plan? (Choose TWO.)",

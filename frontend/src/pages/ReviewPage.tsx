@@ -2,31 +2,39 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import { DifficultyBadge, DomainBadge } from "../components/DomainBadge";
-import type { AttemptRecord, Question } from "../types";
-import { ALL_DOMAINS, DOMAIN_LABEL, formatTime } from "../util";
+import type { AttemptRecord, CertSpec, Question } from "../types";
+import { domainName, formatTime } from "../util";
 
 export function ReviewPage() {
   const { attemptId } = useParams<{ attemptId: string }>();
   const [attempt, setAttempt] = useState<AttemptRecord | null>(null);
+  const [cert, setCert] = useState<CertSpec | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!attemptId) return;
-    const cached = sessionStorage.getItem(`attempt:${attemptId}`);
-    if (cached) {
-      try {
-        setAttempt(JSON.parse(cached) as AttemptRecord);
-        return;
-      } catch {
-        /* fall through */
-      }
-    }
     (async () => {
       try {
-        const data = await api.getAttempts();
-        const match = data.attempts.find((a) => a.id === attemptId);
-        if (!match) setError("attempt not found");
-        else setAttempt(match);
+        let found: AttemptRecord | null = null;
+        const cached = sessionStorage.getItem(`attempt:${attemptId}`);
+        if (cached) {
+          try {
+            found = JSON.parse(cached) as AttemptRecord;
+          } catch {
+            /* fall through */
+          }
+        }
+        if (!found) {
+          const data = await api.getAttempts();
+          found = data.attempts.find((a) => a.id === attemptId) ?? null;
+        }
+        if (!found) {
+          setError("attempt not found");
+          return;
+        }
+        setAttempt(found);
+        const list = await api.listCerts();
+        setCert(list.certs.find((c) => c.id === found!.cert_id) ?? null);
       } catch (e) {
         setError((e as Error).message);
       }
@@ -43,7 +51,7 @@ export function ReviewPage() {
       </div>
     );
   }
-  if (!attempt) return <div className="p-6 text-slate-500">Loading…</div>;
+  if (!attempt || !cert) return <div className="p-6 text-slate-500">Loading…</div>;
 
   const snapshots: Question[] = attempt.question_snapshots ?? [];
   const byId = new Map(snapshots.map((q) => [q.id, q]));
@@ -64,10 +72,17 @@ export function ReviewPage() {
               : "border-red-300 bg-red-50"
         }`}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div>
-            <div className="text-sm uppercase tracking-wide text-slate-500">
-              {attempt.is_special ? "Special exam result" : attempt.passed ? "Passed" : "Did not pass"}
+            <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              {cert.code} · {cert.name.replace(/^AWS Certified /, "")}
+            </div>
+            <div className="mt-1 text-sm uppercase tracking-wide text-slate-500">
+              {attempt.is_special
+                ? "Special exam result"
+                : attempt.passed
+                  ? "Passed"
+                  : "Did not pass"}
             </div>
             <div className="text-4xl font-bold text-slate-900">{percent}%</div>
             <div className="text-sm text-slate-600">
@@ -75,13 +90,13 @@ export function ReviewPage() {
               {new Date(attempt.submitted_at).toLocaleString()}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
-            {ALL_DOMAINS.map((d) => {
-              const c = attempt.per_domain[d];
-              if (c.total === 0) return null;
+          <div className="grid grid-cols-1 gap-x-6 gap-y-1 text-sm">
+            {cert.domains.map((d) => {
+              const c = attempt.per_domain[d.id];
+              if (!c || c.total === 0) return null;
               return (
-                <div key={d} className="flex items-center gap-2">
-                  <span className="text-slate-500">{DOMAIN_LABEL[d]}</span>
+                <div key={d.id} className="flex items-center gap-2">
+                  <span className="text-slate-500">{d.name}</span>
                   <span className="font-mono text-slate-800">
                     {c.correct}/{c.total}
                   </span>
@@ -118,7 +133,7 @@ export function ReviewPage() {
               <div className="mb-2 flex items-center justify-between text-sm text-slate-500">
                 <span>Question {idx + 1}</span>
                 <div className="flex items-center gap-2">
-                  <DomainBadge domain={q.domain} />
+                  <DomainBadge id={q.domain} label={domainName(cert, q.domain)} />
                   <DifficultyBadge difficulty={q.difficulty} />
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs font-semibold ${

@@ -1,7 +1,9 @@
-import type { Question } from "../types";
+import type { CertSpec, Question } from "../types";
+import { domainName } from "../util";
 import { DifficultyBadge, DomainBadge } from "./DomainBadge";
 
 interface QuestionCardProps {
+  cert: CertSpec;
   question: Question;
   optionOrder: string[];
   selected: Set<string>;
@@ -13,6 +15,7 @@ interface QuestionCardProps {
 }
 
 export function QuestionCard({
+  cert,
   question,
   optionOrder,
   selected,
@@ -32,7 +35,7 @@ export function QuestionCard({
           Question {index + 1} of {total}
         </span>
         <div className="flex items-center gap-2">
-          <DomainBadge domain={question.domain} />
+          <DomainBadge id={question.domain} label={domainName(cert, question.domain)} />
           <DifficultyBadge difficulty={question.difficulty} />
           <button
             type="button"

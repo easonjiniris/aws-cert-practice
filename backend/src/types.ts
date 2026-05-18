@@ -1,6 +1,28 @@
-export type Domain = "cloud_concepts" | "security" | "technology" | "billing_pricing";
 export type Difficulty = "easy" | "medium" | "hard";
 export type QuestionType = "multiple_choice" | "multiple_response";
+export type CertLevel = "foundational" | "associate" | "professional" | "specialty";
+
+export interface DomainSpec {
+  id: string;
+  name: string;
+  weight: number;
+  description: string;
+}
+
+export interface CertSpec {
+  id: string;
+  name: string;
+  code: string;
+  level: CertLevel;
+  question_count: number;
+  time_limit_seconds: number;
+  pass_score: number;
+  domains: DomainSpec[];
+}
+
+export interface CertsFile {
+  certs: CertSpec[];
+}
 
 export interface QuestionOption {
   id: string;
@@ -12,7 +34,7 @@ export interface QuestionOption {
 
 export interface Question {
   id: string;
-  domain: Domain;
+  domain: string;
   difficulty: Difficulty;
   type: QuestionType;
   stem: string;
@@ -20,13 +42,15 @@ export interface Question {
 }
 
 export interface QuestionPool {
+  cert_id: string;
   version: number;
   created_at: string;
-  domain_weights: Record<Domain, number>;
+  domain_weights: Record<string, number>;
   questions: Question[];
 }
 
 export interface ExamDefinition {
+  cert_id: string;
   version: number;
   name: string;
   pool_ref: string;
@@ -38,6 +62,7 @@ export interface ExamDefinition {
 }
 
 export interface WrongQuestionEntry {
+  cert_id: string;
   question_id: string;
   source_pool_version: number;
   first_wrong_at: string;
@@ -60,6 +85,7 @@ export interface AttemptAnswer {
 
 export interface AttemptRecord {
   id: string;
+  cert_id: string;
   exam: string;
   is_special: boolean;
   source_pool_version: number | null;
@@ -68,7 +94,7 @@ export interface AttemptRecord {
   time_used_seconds: number;
   score: number;
   passed: boolean;
-  per_domain: Record<Domain, { correct: number; total: number }>;
+  per_domain: Record<string, { correct: number; total: number }>;
   answers: AttemptAnswer[];
 }
 

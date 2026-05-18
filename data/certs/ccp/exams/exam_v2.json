@@ -1,4 +1,5 @@
 {
+  "cert_id": "ccp",
   "version": 2,
   "name": "exam_v2",
   "pool_ref": "question_pool_v2.json",

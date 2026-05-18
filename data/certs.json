@@ -1,0 +1,466 @@
+{
+  "certs": [
+    {
+      "id": "ccp",
+      "name": "AWS Certified Cloud Practitioner",
+      "code": "CLF-C02",
+      "level": "foundational",
+      "question_count": 65,
+      "time_limit_seconds": 5400,
+      "pass_score": 0.70,
+      "domains": [
+        {
+          "id": "cloud_concepts",
+          "name": "Cloud Concepts",
+          "weight": 0.24,
+          "description": "Definitions of cloud computing, six advantages of cloud, AWS Cloud Adoption Framework (CAF) perspectives, AWS Well-Architected Framework pillars, cloud economics (CapEx vs OpEx, TCO), high-level AWS global infrastructure (Regions, AZs, Edge Locations, Local Zones, Wavelength, Outposts), and basic AWS migration strategies (the 7 Rs)."
+        },
+        {
+          "id": "security_compliance",
+          "name": "Security and Compliance",
+          "weight": 0.30,
+          "description": "AWS shared responsibility model (security OF vs IN the cloud); IAM concepts (users, groups, roles, policies, MFA, root user best practices, IAM Identity Center, federation); compliance and AWS Artifact; encryption services (KMS, CloudHSM, ACM); threat detection and monitoring (GuardDuty, Inspector, Macie, Detective, Security Hub); network security (Security Groups vs NACLs, AWS WAF, Shield, Firewall Manager, Network Firewall); auditing (CloudTrail, AWS Config); secrets management (Secrets Manager, Parameter Store)."
+        },
+        {
+          "id": "cloud_technology",
+          "name": "Cloud Technology and Services",
+          "weight": 0.34,
+          "description": "Methods of deploying and operating in the AWS Cloud (Console, CLI, SDKs, CloudFormation, CDK, Elastic Beanstalk); global infrastructure mapping to services; core services across compute (EC2, Lambda, ECS, EKS, Fargate, Lightsail, Batch, Auto Scaling, ELB), storage (S3 classes, EBS, EFS, FSx, Storage Gateway, Backup, Snow Family), databases (RDS, Aurora, DynamoDB, ElastiCache, Redshift, Neptune, DocumentDB), networking (VPC, Route 53, CloudFront, Direct Connect, VPN, Transit Gateway, Global Accelerator, API Gateway), application integration (SQS, SNS, EventBridge, Step Functions), analytics (Athena, Glue, Kinesis, EMR, QuickSight), ML/AI (SageMaker, Rekognition, Comprehend, Polly, Translate, Bedrock at a high level), developer tools (CodeCommit, CodeBuild, CodeDeploy, CodePipeline, X-Ray), management and governance (CloudWatch, CloudTrail, Config, Trusted Advisor, Systems Manager, Organizations, Control Tower)."
+        },
+        {
+          "id": "billing_pricing_support",
+          "name": "Billing, Pricing, and Support",
+          "weight": 0.12,
+          "description": "AWS pricing models (On-Demand, Reserved Instances, Savings Plans, Spot, Dedicated Hosts/Instances, free tier); billing and cost-management tools (Billing Dashboard, Cost Explorer, AWS Budgets, Cost & Usage Report, Cost Allocation Tags); AWS Organizations consolidated billing and benefits; AWS Pricing Calculator and Migration Evaluator (TCO); AWS Support plans (Basic, Developer, Business, Enterprise On-Ramp, Enterprise); AWS Marketplace."
+        }
+      ]
+    },
+    {
+      "id": "aip",
+      "name": "AWS Certified AI Practitioner",
+      "code": "AIF-C01",
+      "level": "foundational",
+      "question_count": 65,
+      "time_limit_seconds": 5400,
+      "pass_score": 0.70,
+      "domains": [
+        {
+          "id": "ai_ml_fundamentals",
+          "name": "Fundamentals of AI and ML",
+          "weight": 0.20,
+          "description": "Core AI/ML concepts: supervised vs unsupervised vs reinforcement learning, training/validation/test data, inferencing, common algorithms (regression, classification, clustering), neural networks at a conceptual level. AWS services positioning (SageMaker for full ML lifecycle vs Rekognition/Comprehend/etc. for managed AI). Practical AI/ML use cases."
+        },
+        {
+          "id": "generative_ai_fundamentals",
+          "name": "Fundamentals of Generative AI",
+          "weight": 0.24,
+          "description": "Foundation models, large language models, transformer architecture at a conceptual level, tokens and context windows, prompt engineering basics, embeddings and vector databases, retrieval-augmented generation (RAG), fine-tuning vs prompt engineering vs RAG trade-offs, evaluation of generative outputs."
+        },
+        {
+          "id": "foundation_model_applications",
+          "name": "Applications of Foundation Models",
+          "weight": 0.28,
+          "description": "Amazon Bedrock (model providers, model selection, Knowledge Bases, Agents, Guardrails); Amazon Q (Business, Developer); SageMaker JumpStart; building generative AI applications on AWS; integrating with data sources; cost considerations; agent workflows."
+        },
+        {
+          "id": "responsible_ai",
+          "name": "Guidelines for Responsible AI",
+          "weight": 0.14,
+          "description": "Bias and fairness in ML models, transparency and explainability, AWS AI Service Cards, model card concepts, hallucination mitigation in generative AI, human-in-the-loop review (Amazon Augmented AI / A2I), Bedrock Guardrails for content filtering, dataset documentation."
+        },
+        {
+          "id": "ai_security_governance",
+          "name": "Security, Compliance, and Governance for AI Solutions",
+          "weight": 0.14,
+          "description": "Data privacy with foundation models (no training on inputs by default in Bedrock), IAM for AI services, VPC endpoints for Bedrock/SageMaker, encryption of training data and models, audit trails via CloudTrail, AWS compliance programs relevant to AI workloads, customer responsibility for prompt content and model outputs."
+        }
+      ]
+    },
+    {
+      "id": "saa",
+      "name": "AWS Certified Solutions Architect – Associate",
+      "code": "SAA-C03",
+      "level": "associate",
+      "question_count": 65,
+      "time_limit_seconds": 7800,
+      "pass_score": 0.72,
+      "domains": [
+        {
+          "id": "design_secure_architectures",
+          "name": "Design Secure Architectures",
+          "weight": 0.30,
+          "description": "Secure access to AWS resources (IAM users/roles/policies, identity federation, AWS Organizations SCPs, IAM Identity Center); secure workloads and applications (security groups, NACLs, AWS WAF, Shield, GuardDuty, Inspector, Macie, Network Firewall); data protection (encryption at rest with KMS/CloudHSM, encryption in transit with ACM/TLS, S3 bucket policies, S3 Block Public Access, Macie for PII)."
+        },
+        {
+          "id": "design_resilient_architectures",
+          "name": "Design Resilient Architectures",
+          "weight": 0.26,
+          "description": "Scalable and loosely coupled architectures (Auto Scaling, ELB, SQS, SNS, EventBridge, API Gateway); highly available and fault-tolerant designs (multi-AZ, multi-Region, Route 53 routing policies, CloudFront, RDS Multi-AZ, DynamoDB Global Tables); disaster recovery strategies (backup and restore, pilot light, warm standby, multi-site active/active) with RPO/RTO trade-offs."
+        },
+        {
+          "id": "design_high_performing_architectures",
+          "name": "Design High-Performing Architectures",
+          "weight": 0.24,
+          "description": "High-performing and scalable storage (S3 classes, S3 Transfer Acceleration, EBS volume types, EFS, FSx); high-performing compute (EC2 instance families, Lambda concurrency, container orchestration); high-performing databases (read replicas, Aurora, DynamoDB DAX, ElastiCache); high-performing networking (placement groups, enhanced networking, CloudFront, Global Accelerator); data ingestion and transformation patterns (Kinesis, AWS Glue, MSK)."
+        },
+        {
+          "id": "design_cost_optimized_architectures",
+          "name": "Design Cost-Optimized Architectures",
+          "weight": 0.20,
+          "description": "Cost-optimized storage (S3 lifecycle policies, S3 Intelligent-Tiering, EBS gp3, deletion of unattached volumes); cost-optimized compute (Reserved Instances, Savings Plans, Spot, right-sizing, Auto Scaling); cost-optimized databases (Aurora Serverless v2, RDS storage autoscaling); cost-optimized networking (VPC endpoints to avoid NAT charges, CloudFront vs Global Accelerator); tagging, AWS Cost Explorer, AWS Budgets, Compute Optimizer, Trusted Advisor."
+        }
+      ]
+    },
+    {
+      "id": "dva",
+      "name": "AWS Certified Developer – Associate",
+      "code": "DVA-C02",
+      "level": "associate",
+      "question_count": 65,
+      "time_limit_seconds": 7800,
+      "pass_score": 0.72,
+      "domains": [
+        {
+          "id": "development_with_aws",
+          "name": "Development with AWS Services",
+          "weight": 0.32,
+          "description": "Writing code for serverless apps (Lambda, API Gateway, Step Functions, EventBridge); using AWS SDKs and CLI; integrating with managed services (DynamoDB, S3, SQS, SNS, Kinesis, Cognito); handling Lambda execution context, cold starts, concurrency, environment variables, layers, and event sources; designing event-driven, decoupled architectures."
+        },
+        {
+          "id": "security",
+          "name": "Security",
+          "weight": 0.26,
+          "description": "Authentication and authorization with Cognito (User Pools, Identity Pools), IAM roles for Lambda/EC2/ECS, signed URLs and signed cookies for S3/CloudFront, KMS encryption (customer managed vs AWS managed keys, envelope encryption), Secrets Manager and Parameter Store for credentials, application-level encryption, AWS STS for temporary credentials."
+        },
+        {
+          "id": "deployment",
+          "name": "Deployment",
+          "weight": 0.24,
+          "description": "CI/CD pipelines with CodePipeline, CodeBuild, CodeDeploy (in-place, blue/green, canary), CodeCommit; deployment of Lambda (versions, aliases, weighted aliases, SAM, CDK); deployment of containers (ECS task definitions, ECR, Fargate); CloudFormation and SAM templates; Elastic Beanstalk environments and deployment policies."
+        },
+        {
+          "id": "troubleshooting_optimization",
+          "name": "Troubleshooting and Optimization",
+          "weight": 0.18,
+          "description": "Observability with CloudWatch Logs, Metrics, Alarms, Logs Insights, Embedded Metric Format; distributed tracing with X-Ray; debugging Lambda timeouts/memory/throttling; DynamoDB hot partitions and exponential backoff; API Gateway throttling and caching; performance tuning (Lambda memory sizing, DynamoDB Accelerator (DAX), ElastiCache, CloudFront)."
+        }
+      ]
+    },
+    {
+      "id": "soa",
+      "name": "AWS Certified SysOps Administrator – Associate",
+      "code": "SOA-C02",
+      "level": "associate",
+      "question_count": 65,
+      "time_limit_seconds": 10800,
+      "pass_score": 0.72,
+      "domains": [
+        {
+          "id": "monitoring_logging_remediation",
+          "name": "Monitoring, Logging, and Remediation",
+          "weight": 0.20,
+          "description": "CloudWatch metrics, custom metrics, alarms (composite, anomaly detection), dashboards, Logs, Logs Insights, Contributor Insights, ServiceLens; CloudTrail event history, Insights events; EventBridge rules for automated remediation; Systems Manager Automation runbooks; AWS Health Dashboard; AWS Config rules and remediation."
+        },
+        {
+          "id": "reliability_continuity",
+          "name": "Reliability and Business Continuity",
+          "weight": 0.16,
+          "description": "Auto Scaling groups, scaling policies (target tracking, step, scheduled), lifecycle hooks; ELB health checks and connection draining; RDS Multi-AZ, read replicas, automated backups, snapshots; DynamoDB backups (on-demand, PITR); EBS snapshots, AWS Backup plans; cross-Region replication for S3, RDS, DynamoDB Global Tables; Route 53 health checks and failover routing."
+        },
+        {
+          "id": "deployment_provisioning_automation",
+          "name": "Deployment, Provisioning, and Automation",
+          "weight": 0.18,
+          "description": "CloudFormation (stacks, change sets, drift detection, StackSets, nested stacks, parameters/conditions/intrinsic functions); Systems Manager (Parameter Store, Patch Manager, State Manager, Run Command, Session Manager); AMI lifecycle and EC2 Image Builder; OpsWorks at a high level; Elastic Beanstalk environments; Service Catalog for standardized provisioning."
+        },
+        {
+          "id": "security_compliance_ops",
+          "name": "Security and Compliance",
+          "weight": 0.16,
+          "description": "IAM policy evaluation, permissions boundaries, SCPs, IAM Access Analyzer; security groups vs NACL troubleshooting; VPC Flow Logs; AWS Config conformance packs; CloudTrail log integrity validation; KMS key rotation and grants; GuardDuty findings response; Secrets Manager rotation; certificate management with ACM."
+        },
+        {
+          "id": "networking_content_delivery",
+          "name": "Networking and Content Delivery",
+          "weight": 0.18,
+          "description": "VPC architecture (subnets, route tables, IGW, NAT, VPC endpoints, peering, Transit Gateway), troubleshooting connectivity; DNS with Route 53 (routing policies, private hosted zones); CloudFront distributions, origins, behaviors, signed URLs, cache invalidation; Global Accelerator vs CloudFront; Direct Connect and Site-to-Site VPN; ELB types (ALB, NLB, GLB) and target groups."
+        },
+        {
+          "id": "cost_performance",
+          "name": "Cost and Performance Optimization",
+          "weight": 0.12,
+          "description": "Trusted Advisor checks, AWS Compute Optimizer, AWS Cost Explorer, Cost & Usage Report, AWS Budgets and Budget Actions; Savings Plans and RI utilization/coverage; right-sizing recommendations; storage tiering for S3 and EBS; identifying unused resources (EIPs, EBS volumes, snapshots); CloudWatch metrics for performance baselines."
+        }
+      ]
+    },
+    {
+      "id": "dea",
+      "name": "AWS Certified Data Engineer – Associate",
+      "code": "DEA-C01",
+      "level": "associate",
+      "question_count": 65,
+      "time_limit_seconds": 7800,
+      "pass_score": 0.72,
+      "domains": [
+        {
+          "id": "data_ingestion_transformation",
+          "name": "Data Ingestion and Transformation",
+          "weight": 0.34,
+          "description": "Batch and streaming ingestion (Kinesis Data Streams, Kinesis Data Firehose, MSK, DMS, AWS Glue, AppFlow, Snowball, Storage Gateway, DataSync); transformations with AWS Glue ETL (Spark, Python shell, Glue Studio, Glue DataBrew), EMR (Spark, Hive, Presto), Lambda; orchestration with Step Functions, Glue workflows, MWAA (Managed Airflow), EventBridge; data formats (Parquet, ORC, Avro, JSON) and compression."
+        },
+        {
+          "id": "data_store_management",
+          "name": "Data Store Management",
+          "weight": 0.26,
+          "description": "Choosing the right data store: S3 (storage classes, lifecycle), Redshift (RA3, Spectrum, Concurrency Scaling, materialized views), DynamoDB (partitioning, GSIs/LSIs), Aurora, RDS, ElastiCache, DocumentDB, Neptune, Timestream, OpenSearch; data modeling (star vs snowflake, normalized vs denormalized); partitioning and sorting for analytics workloads; data catalog with Glue Data Catalog and Lake Formation."
+        },
+        {
+          "id": "data_operations_support",
+          "name": "Data Operations and Support",
+          "weight": 0.22,
+          "description": "Querying with Athena, Redshift, EMR; building dashboards with QuickSight; observability for data pipelines (CloudWatch, Glue job metrics, EMR step logs); cost monitoring (Redshift workload management, Spectrum vs Redshift, S3 lifecycle); troubleshooting failed pipelines, Spark job tuning, data skew; SLA management; automating with Step Functions and EventBridge."
+        },
+        {
+          "id": "data_security_governance",
+          "name": "Data Security and Governance",
+          "weight": 0.18,
+          "description": "Encryption at rest (KMS, S3 SSE-S3/SSE-KMS/SSE-C, Redshift cluster encryption); encryption in transit (TLS, VPC endpoints); access control (S3 bucket policies, Lake Formation permissions, Redshift IAM, row/column-level security); PII detection with Macie; data classification and tagging; audit with CloudTrail; cross-account data sharing (Lake Formation, Redshift data sharing, S3 Access Points)."
+        }
+      ]
+    },
+    {
+      "id": "mla",
+      "name": "AWS Certified Machine Learning Engineer – Associate",
+      "code": "MLA-C01",
+      "level": "associate",
+      "question_count": 65,
+      "time_limit_seconds": 7800,
+      "pass_score": 0.72,
+      "domains": [
+        {
+          "id": "data_preparation",
+          "name": "Data Preparation for ML",
+          "weight": 0.28,
+          "description": "Data ingestion from S3/RDS/DynamoDB/Kinesis; cleaning, transformation, and feature engineering with SageMaker Data Wrangler, Glue, EMR, AWS Glue DataBrew; handling missing values, outliers, imbalanced classes; encoding categorical variables and scaling; SageMaker Feature Store (online/offline); data labeling with SageMaker Ground Truth; data quality and drift detection."
+        },
+        {
+          "id": "model_development",
+          "name": "ML Model Development",
+          "weight": 0.26,
+          "description": "Choosing algorithms (XGBoost, Linear Learner, K-Means, Random Cut Forest, BlazingText, Object2Vec, DeepAR, Image Classification, etc.); training jobs (instance types, distributed training, spot instances, managed spot training); hyperparameter optimization with SageMaker AMT; SageMaker Built-in algorithms vs script mode (PyTorch, TensorFlow, Hugging Face); evaluation metrics for classification, regression, and ranking; SageMaker JumpStart and pre-built models."
+        },
+        {
+          "id": "deployment_orchestration",
+          "name": "Deployment and Orchestration of ML Workflows",
+          "weight": 0.22,
+          "description": "SageMaker endpoints (real-time, serverless, asynchronous), batch transform, multi-model endpoints; deployment strategies (blue/green, canary, shadow); SageMaker Pipelines, EventBridge, Step Functions for workflow orchestration; SageMaker Projects with CI/CD; A/B testing with multi-variant endpoints; auto-scaling endpoints based on metrics."
+        },
+        {
+          "id": "ml_monitoring_security",
+          "name": "ML Solution Monitoring, Maintenance, and Security",
+          "weight": 0.24,
+          "description": "SageMaker Model Monitor (data quality, model quality, bias drift, feature attribution drift); SageMaker Clarify for bias and explainability; CloudWatch metrics and logs for SageMaker; IAM for SageMaker (execution roles, VPC mode, network isolation); KMS for encryption of training data, models, and endpoints; model lineage tracking with SageMaker Lineage; cost optimization (right-sizing instances, serverless inference, autoscaling)."
+        }
+      ]
+    },
+    {
+      "id": "sap",
+      "name": "AWS Certified Solutions Architect – Professional",
+      "code": "SAP-C02",
+      "level": "professional",
+      "question_count": 75,
+      "time_limit_seconds": 10800,
+      "pass_score": 0.75,
+      "domains": [
+        {
+          "id": "design_for_org_complexity",
+          "name": "Design Solutions for Organizational Complexity",
+          "weight": 0.26,
+          "description": "AWS Organizations (SCPs, OUs, consolidated billing, AWS Control Tower); multi-account strategies and landing zones; cross-account access (IAM roles, AWS RAM, Lake Formation cross-account); hybrid connectivity (Direct Connect, Site-to-Site VPN, Transit Gateway, AWS Cloud WAN, Private NAT, Privatelink); federated identity (IAM Identity Center, SAML, Cognito, AD); cross-account networking architectures."
+        },
+        {
+          "id": "design_new_solutions",
+          "name": "Design for New Solutions",
+          "weight": 0.29,
+          "description": "Greenfield architecture decisions across compute (EC2/Lambda/ECS/EKS/Fargate), storage (S3 patterns, EFS, FSx for Lustre/Windows/NetApp ONTAP), databases (Aurora Global Database, DynamoDB Global Tables, RDS Multi-AZ), analytics (Redshift, EMR, Athena, Kinesis), and ML; trade-offs between cost, performance, reliability, security; choosing between event-driven, microservices, and serverless patterns; data lake and lakehouse designs."
+        },
+        {
+          "id": "continuous_improvement",
+          "name": "Continuous Improvement for Existing Solutions",
+          "weight": 0.25,
+          "description": "Well-Architected reviews; identifying anti-patterns; refactoring monoliths to microservices/serverless; right-sizing and Savings Plans/RIs; observability uplift (CloudWatch, X-Ray, Container Insights, AppDynamics-style with Managed Grafana/Prometheus); resilience improvements (Multi-AZ → Multi-Region, failover testing); security posture improvements (Security Hub, GuardDuty, Macie, Inspector, Access Analyzer); operational excellence (IaC, GitOps, automated remediation)."
+        },
+        {
+          "id": "migration_modernization",
+          "name": "Accelerate Workload Migration and Modernization",
+          "weight": 0.20,
+          "description": "Migration strategies (the 7 Rs); AWS Application Migration Service (MGN), AWS DMS, AWS DataSync, Snow Family, Storage Gateway; refactoring monoliths to containers (App2Container) or serverless; database migration patterns (homogeneous vs heterogeneous via DMS + SCT); modernization with managed services; cutover planning, rollback strategies, blue/green deployments at the workload level."
+        }
+      ]
+    },
+    {
+      "id": "dop",
+      "name": "AWS Certified DevOps Engineer – Professional",
+      "code": "DOP-C02",
+      "level": "professional",
+      "question_count": 75,
+      "time_limit_seconds": 10800,
+      "pass_score": 0.75,
+      "domains": [
+        {
+          "id": "sdlc_automation",
+          "name": "SDLC Automation",
+          "weight": 0.22,
+          "description": "Source control (CodeCommit, GitHub integrations); CI/CD pipelines (CodePipeline, CodeBuild, CodeDeploy, Jenkins on AWS); testing automation; artifact management (CodeArtifact, ECR); deployment strategies (blue/green, canary, rolling, all-at-once) for EC2, Lambda, ECS, and EKS; approval gates; pipeline-as-code (CDK Pipelines, CloudFormation)."
+        },
+        {
+          "id": "config_management_iac",
+          "name": "Configuration Management and Infrastructure as Code",
+          "weight": 0.17,
+          "description": "CloudFormation (StackSets, nested stacks, drift detection, change sets, custom resources, helper scripts); CDK and SAM; Systems Manager (Parameter Store, State Manager, Patch Manager, Run Command, Session Manager, Automation runbooks); AWS Config rules and conformance packs; immutable infrastructure with golden AMIs (EC2 Image Builder); OpsWorks at a high level."
+        },
+        {
+          "id": "resilient_solutions",
+          "name": "Resilient Cloud Solutions",
+          "weight": 0.15,
+          "description": "Auto Scaling (groups, lifecycle hooks, instance refresh, warm pools); multi-AZ and multi-Region architectures; backup and DR (AWS Backup, cross-Region replication, Route 53 failover, RTO/RPO design); chaos engineering with AWS Fault Injection Service; circuit breakers and retries with exponential backoff; SQS dead-letter queues; idempotent design."
+        },
+        {
+          "id": "monitoring_logging",
+          "name": "Monitoring and Logging",
+          "weight": 0.15,
+          "description": "CloudWatch (custom metrics, EMF, Logs Insights, Container Insights, Application Insights, anomaly detection alarms); X-Ray and ADOT (AWS Distro for OpenTelemetry); centralized logging (CloudWatch cross-account, Kinesis Firehose to S3/OpenSearch, log aggregation patterns); CloudTrail (organization trails, Insights, log file integrity); Managed Grafana and Managed Prometheus."
+        },
+        {
+          "id": "incident_event_response",
+          "name": "Incident and Event Response",
+          "weight": 0.14,
+          "description": "Event-driven automation with EventBridge, SNS, Lambda, Systems Manager Automation; incident response runbooks (Systems Manager Incident Manager); CloudWatch Alarms triggering remediation; auto-recovery and self-healing infrastructure; GameDay testing; post-incident analysis with Logs Insights and X-Ray; integration with PagerDuty/Slack via SNS or EventBridge API destinations."
+        },
+        {
+          "id": "security_compliance_devops",
+          "name": "Security and Compliance",
+          "weight": 0.17,
+          "description": "Least-privilege IAM for pipelines (CodePipeline service roles, CodeBuild service roles); Secrets Manager integration in CodeBuild/Lambda; CodeGuru Reviewer for code security; container image scanning (ECR scanning, Inspector); secure pipelines (artifact integrity, signing with CodeArtifact and Signer); compliance as code with AWS Config conformance packs; cross-account audit trails; GuardDuty and Security Hub for centralized findings."
+        }
+      ]
+    },
+    {
+      "id": "ans",
+      "name": "AWS Certified Advanced Networking – Specialty",
+      "code": "ANS-C01",
+      "level": "specialty",
+      "question_count": 65,
+      "time_limit_seconds": 10200,
+      "pass_score": 0.75,
+      "domains": [
+        {
+          "id": "network_design",
+          "name": "Network Design",
+          "weight": 0.30,
+          "description": "VPC design (CIDR planning, subnet strategy, IPv6, dual-stack); hybrid connectivity (Direct Connect with VIFs (private, public, transit), DX Gateway, Site-to-Site VPN, AWS VPN CloudHub, accelerated VPN, MACsec); transit architectures (Transit Gateway, Cloud WAN, peering); edge networking (Route 53, CloudFront, Global Accelerator, Wavelength, Outposts, Local Zones); multicast on TGW; segmentation (TGW route tables, security groups, NACLs, AWS Network Firewall, GWLB)."
+        },
+        {
+          "id": "network_implementation",
+          "name": "Network Implementation",
+          "weight": 0.26,
+          "description": "Implementing VPCs, subnets, route tables, NAT gateways/instances, IGW, VPC endpoints (Gateway and Interface/PrivateLink); BGP configurations for Direct Connect and VPN (AS_PATH prepending, MED, local preference); IPSec tunnel troubleshooting; ELB types deep dive (ALB, NLB, GWLB, target group attributes, idle timeouts, sticky sessions); DNS implementation (Route 53 public/private hosted zones, Resolver inbound/outbound endpoints, query logging)."
+        },
+        {
+          "id": "network_management",
+          "name": "Network Management and Operation",
+          "weight": 0.20,
+          "description": "VPC Flow Logs (S3, CloudWatch, parquet format); Traffic Mirroring; Reachability Analyzer and Network Access Analyzer; CloudWatch Internet Monitor; Direct Connect monitoring (CloudWatch metrics for BGP/VIF); troubleshooting connectivity (Flow Logs, packet capture via Traffic Mirroring, NAT failover, asymmetric routing); automation with CloudFormation/CDK for networking; cost optimization (NAT vs VPC endpoints, Direct Connect vs VPN, data transfer charges)."
+        },
+        {
+          "id": "network_security",
+          "name": "Network Security, Compliance, and Governance",
+          "weight": 0.24,
+          "description": "Security groups vs NACLs vs AWS Network Firewall vs WAF vs Shield; perimeter protection (Shield Advanced, WAF rule sets, AWS Firewall Manager for org-wide policies); inspection architectures with Gateway Load Balancer; encryption in transit (TLS termination at ALB/CloudFront, ACM Private CA, MACsec on Direct Connect); private connectivity (PrivateLink VPC endpoints, VPC Lattice); segmentation across accounts (RAM, TGW route tables, Cloud WAN segments); compliance via Config rules for networking."
+        }
+      ]
+    },
+    {
+      "id": "scs",
+      "name": "AWS Certified Security – Specialty",
+      "code": "SCS-C02",
+      "level": "specialty",
+      "question_count": 65,
+      "time_limit_seconds": 10200,
+      "pass_score": 0.75,
+      "domains": [
+        {
+          "id": "threat_detection_response",
+          "name": "Threat Detection and Incident Response",
+          "weight": 0.14,
+          "description": "GuardDuty (finding types, S3 protection, Malware Protection for EC2/EBS, EKS protection, RDS protection); Security Hub (aggregated findings, security standards, automated response); Detective for investigation; incident response runbooks via Systems Manager and EventBridge; isolating compromised resources (security group quarantine, snapshot evidence, key revocation); CloudTrail for forensics; AWS WAF rule changes for active attacks."
+        },
+        {
+          "id": "logging_monitoring",
+          "name": "Security Logging and Monitoring",
+          "weight": 0.18,
+          "description": "CloudTrail (event types, organization trails, log file integrity, Insights events); VPC Flow Logs and DNS query logs; AWS Config (resource history, rules, conformance packs); CloudWatch Logs and metric filters; centralized logging architectures (Kinesis Firehose to S3/OpenSearch); log retention and immutability (S3 Object Lock, log file integrity validation); AWS Audit Manager."
+        },
+        {
+          "id": "infrastructure_security",
+          "name": "Infrastructure Security",
+          "weight": 0.20,
+          "description": "VPC design for security (segmentation, private subnets, VPC endpoints, PrivateLink); AWS Network Firewall, AWS WAF, AWS Shield Advanced, AWS Firewall Manager; Inspector for EC2/Lambda/ECR; Systems Manager Patch Manager and Session Manager; bastion alternatives; EC2 hardening (SSM, IMDSv2); container security (ECR scanning, image signing); serverless security (Lambda execution roles, code signing)."
+        },
+        {
+          "id": "iam",
+          "name": "Identity and Access Management",
+          "weight": 0.16,
+          "description": "IAM policy types (identity, resource, SCP, permissions boundary, session policy); policy evaluation logic; IAM Access Analyzer (external access, validation); IAM Identity Center (SSO) with SAML/SCIM, permission sets; Cognito User Pools and Identity Pools; AWS STS (AssumeRole, AssumeRoleWithSAML, AssumeRoleWithWebIdentity); cross-account access patterns; condition keys (aws:SourceVpc, aws:SourceIp, aws:PrincipalTag, etc.)."
+        },
+        {
+          "id": "data_protection",
+          "name": "Data Protection",
+          "weight": 0.18,
+          "description": "KMS (key types: AWS managed, customer managed, custom key stores via CloudHSM; key policies vs grants; key rotation; multi-Region keys); CloudHSM; AWS Certificate Manager (public and private CAs); S3 encryption options (SSE-S3, SSE-KMS, SSE-C, DSSE-KMS, bucket keys); EBS/RDS encryption; envelope encryption patterns; Macie for PII discovery and classification; Secrets Manager rotation; data tokenization patterns."
+        },
+        {
+          "id": "management_governance",
+          "name": "Management and Security Governance",
+          "weight": 0.14,
+          "description": "AWS Organizations (SCPs, tag policies, backup policies, AI services opt-out policies); Control Tower (landing zone, guardrails); AWS Config rules and aggregators; AWS Audit Manager and Artifact; cost governance for security tooling; multi-account security architectures (delegated administrator pattern for GuardDuty/Security Hub/Macie/Detective); compliance frameworks (PCI DSS, HIPAA, FedRAMP) mapping to AWS services."
+        }
+      ]
+    },
+    {
+      "id": "mls",
+      "name": "AWS Certified Machine Learning – Specialty",
+      "code": "MLS-C01",
+      "level": "specialty",
+      "question_count": 65,
+      "time_limit_seconds": 10800,
+      "pass_score": 0.75,
+      "domains": [
+        {
+          "id": "data_engineering",
+          "name": "Data Engineering",
+          "weight": 0.20,
+          "description": "Repositories for ML data (S3 as data lake, structured stores like Redshift/RDS); ingestion (Kinesis, Glue, DMS, Snow Family, Direct Connect for hybrid); transformation and feature engineering with Glue, EMR (Spark), AWS Batch, Lambda; data formats (Parquet, ORC, RecordIO-Protobuf for SageMaker); partitioning strategies; security of training data (KMS, bucket policies, IAM)."
+        },
+        {
+          "id": "exploratory_data_analysis",
+          "name": "Exploratory Data Analysis",
+          "weight": 0.24,
+          "description": "Sanitizing and preparing data (handling missing values, outliers, duplicates); feature engineering (binning, one-hot encoding, scaling, normalization, polynomial features, text vectorization with TF-IDF/word embeddings, image augmentation); visualization with QuickSight, SageMaker Studio notebooks (matplotlib, seaborn); dimensionality reduction (PCA, t-SNE); identifying bias and class imbalance; SageMaker Data Wrangler."
+        },
+        {
+          "id": "modeling",
+          "name": "Modeling",
+          "weight": 0.36,
+          "description": "Framing the business problem as an ML problem (regression, classification, clustering, recommendation, forecasting, anomaly detection, NLP, computer vision); choosing built-in SageMaker algorithms (XGBoost, Linear Learner, K-Means, Random Cut Forest, BlazingText, Image Classification, Object Detection, Semantic Segmentation, DeepAR, Object2Vec, IP Insights, LDA, NTM, KNN, PCA); training (instance types, distributed training, spot, checkpointing); hyperparameter tuning with SageMaker AMT; evaluation metrics for each problem type; addressing overfitting/underfitting; SageMaker JumpStart for pre-built models."
+        },
+        {
+          "id": "ml_implementation_operations",
+          "name": "Machine Learning Implementation and Operations",
+          "weight": 0.20,
+          "description": "Deploying models with SageMaker endpoints (real-time, serverless, asynchronous, batch transform, multi-model, multi-container endpoints); CI/CD for ML with SageMaker Pipelines and SageMaker Projects; A/B testing and shadow testing; auto-scaling endpoints; model monitoring with Model Monitor and Clarify (data drift, concept drift, bias drift); model retraining workflows; cost optimization (instance right-sizing, Inferentia/Trainium, serverless inference); security and compliance (IAM, VPC mode, KMS, network isolation)."
+        }
+      ]
+    }
+  ]
+}

@@ -1,11 +1,5 @@
-import { z } from "zod";
-
-export const domainSchema = z.enum([
-  "cloud_concepts",
-  "security",
-  "technology",
-  "billing_pricing",
-]);
+import { z, type ZodTypeAny } from "zod";
+import type { CertSpec } from "../types.js";
 
 export const difficultySchema = z.enum(["easy", "medium", "hard"]);
 export const questionTypeSchema = z.enum(["multiple_choice", "multiple_response"]);
@@ -45,43 +39,56 @@ const questionCorrectnessCheck = (
   }
 };
 
-export const questionSchema = z
-  .object({
-    id: z.string().min(1),
-    domain: domainSchema,
-    difficulty: difficultySchema,
-    type: questionTypeSchema,
-    stem: z.string().min(1),
-    options: z.array(optionSchema).min(4),
-  })
-  .superRefine(questionCorrectnessCheck);
+function buildDomainSchema(cert: CertSpec): ZodTypeAny {
+  const ids = cert.domains.map((d) => d.id);
+  if (ids.length === 0) return z.string().min(1);
+  return z.enum(ids as [string, ...string[]]);
+}
 
-export const questionWithoutIdSchema = z
-  .object({
-    domain: domainSchema,
-    difficulty: difficultySchema,
-    type: questionTypeSchema,
-    stem: z.string().min(1),
-    options: z.array(optionSchema).min(4),
-  })
-  .superRefine(questionCorrectnessCheck);
+export function makeQuestionWithoutIdSchema(cert: CertSpec) {
+  const domain = buildDomainSchema(cert);
+  return z
+    .object({
+      domain,
+      difficulty: difficultySchema,
+      type: questionTypeSchema,
+      stem: z.string().min(1),
+      options: z.array(optionSchema).min(4),
+    })
+    .superRefine(questionCorrectnessCheck);
+}
 
-export type QuestionWithoutId = z.infer<typeof questionWithoutIdSchema>;
+export function makeQuestionsArraySchema(cert: CertSpec) {
+  return z.array(makeQuestionWithoutIdSchema(cert)).min(1);
+}
 
-export const questionsArraySchema = z.array(questionWithoutIdSchema).min(1);
+export function makeQuestionSchema(cert: CertSpec) {
+  const domain = buildDomainSchema(cert);
+  return z
+    .object({
+      id: z.string().min(1),
+      domain,
+      difficulty: difficultySchema,
+      type: questionTypeSchema,
+      stem: z.string().min(1),
+      options: z.array(optionSchema).min(4),
+    })
+    .superRefine(questionCorrectnessCheck);
+}
 
-export const domainWeightsSchema = z.object({
-  cloud_concepts: z.number(),
-  security: z.number(),
-  technology: z.number(),
-  billing_pricing: z.number(),
-});
+export function makePoolSchema(cert: CertSpec) {
+  const domainIds = cert.domains.map((d) => d.id);
+  const weightsShape = Object.fromEntries(
+    domainIds.map((id) => [id, z.number()])
+  );
+  return z.object({
+    cert_id: z.literal(cert.id),
+    version: z.number().int().positive(),
+    created_at: z.string().min(1),
+    domain_weights: z.object(weightsShape),
+    questions: z.array(makeQuestionSchema(cert)).min(1),
+  });
+}
 
-export const poolSchema = z.object({
-  version: z.number().int().positive(),
-  created_at: z.string().min(1),
-  domain_weights: domainWeightsSchema,
-  questions: z.array(questionSchema).min(1),
-});
-
-export type PoolSchema = z.infer<typeof poolSchema>;
+export type PoolSchema<Cert extends CertSpec> = z.infer<ReturnType<typeof makePoolSchema>>;
+export type QuestionWithoutId = z.infer<ReturnType<typeof makeQuestionWithoutIdSchema>>;

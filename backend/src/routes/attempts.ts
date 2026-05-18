@@ -26,8 +26,8 @@ attemptsRouter.get("/attempts", async (_req, res) => {
 attemptsRouter.post("/attempt", async (req, res) => {
   try {
     const attempt = req.body as AttemptRecord;
-    if (!attempt || typeof attempt !== "object" || !attempt.id) {
-      res.status(400).json({ error: "invalid attempt body" });
+    if (!attempt || typeof attempt !== "object" || !attempt.id || !attempt.cert_id) {
+      res.status(400).json({ error: "invalid attempt body (missing id or cert_id)" });
       return;
     }
 
@@ -35,7 +35,7 @@ attemptsRouter.post("/attempt", async (req, res) => {
     attempts.attempts.push(attempt);
     await writeAttempts(attempts);
 
-    const wrong = await readWrong();
+    const wrong = await readWrong(attempt.cert_id);
 
     if (attempt.is_special) {
       const correctIds = new Set(
@@ -50,7 +50,7 @@ attemptsRouter.post("/attempt", async (req, res) => {
       let questionLookup: Map<string, Question> | null = null;
       if (poolVersion != null) {
         try {
-          const pool = await readPool(poolVersion);
+          const pool = await readPool(attempt.cert_id, poolVersion);
           questionLookup = new Map(pool.questions.map((q) => [q.id, q]));
         } catch {
           questionLookup = null;
@@ -67,6 +67,7 @@ attemptsRouter.post("/attempt", async (req, res) => {
           const snapshot = questionLookup?.get(a.question_id);
           if (!snapshot) continue;
           const entry: WrongQuestionEntry = {
+            cert_id: attempt.cert_id,
             question_id: a.question_id,
             source_pool_version: poolVersion ?? 0,
             first_wrong_at: attempt.submitted_at,
@@ -80,7 +81,7 @@ attemptsRouter.post("/attempt", async (req, res) => {
       wrong.questions = Array.from(wrongMap.values());
     }
 
-    await writeWrong(wrong);
+    await writeWrong(attempt.cert_id, wrong);
     res.json({ ok: true, attempt_id: attempt.id });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });

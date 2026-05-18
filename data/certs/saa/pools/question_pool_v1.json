@@ -1,0 +1,39 @@
+{
+  "cert_id": "saa",
+  "version": 1,
+  "created_at": "2026-05-18T17:00:00Z",
+  "domain_weights": {
+    "design_secure_architectures": 0.30,
+    "design_resilient_architectures": 0.26,
+    "design_high_performing_architectures": 0.24,
+    "design_cost_optimized_architectures": 0.20
+  },
+  "questions": [
+    {
+      "id": "saa-v1-q001",
+      "domain": "design_resilient_architectures",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "stem": "A company runs a critical web application on Amazon EC2 instances behind an Application Load Balancer in a single Availability Zone. The team wants to maximize availability with minimal application changes. What should a Solutions Architect recommend?",
+      "options": [
+        { "id": "A", "text": "Deploy a NAT Gateway in front of the application.", "is_correct": false, "reason": "NAT Gateways provide outbound internet access for private subnets, not inbound high availability." },
+        { "id": "B", "text": "Place EC2 instances in an Auto Scaling group across multiple Availability Zones and register them with the ALB.", "is_correct": true },
+        { "id": "C", "text": "Increase the size of the EC2 instances to handle more traffic.", "is_correct": false, "reason": "Vertical scaling improves capacity but does not eliminate the single-AZ failure domain." },
+        { "id": "D", "text": "Add Amazon CloudFront in front of the ALB.", "is_correct": false, "reason": "CloudFront improves latency and reduces origin load, but doesn't address the underlying single-AZ availability problem." }
+      ]
+    },
+    {
+      "id": "saa-v1-q002",
+      "domain": "design_cost_optimized_architectures",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "stem": "A workload runs continuously 24/7 for the next 3 years on EC2. Which pricing model offers the largest discount over On-Demand?",
+      "options": [
+        { "id": "A", "text": "Spot Instances", "is_correct": false, "reason": "Spot offers steep discounts but instances can be interrupted with two minutes' notice, which is unsuitable for steady 24/7 workloads." },
+        { "id": "B", "text": "On-Demand Instances", "is_correct": false, "reason": "On-Demand is the baseline price; it offers no discount." },
+        { "id": "C", "text": "3-year Compute Savings Plan, all upfront", "is_correct": true },
+        { "id": "D", "text": "Dedicated Hosts on-demand", "is_correct": false, "reason": "Dedicated Hosts are more expensive than shared tenancy and meant for licensing/compliance, not cost savings." }
+      ]
+    }
+  ]
+}

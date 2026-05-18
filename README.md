@@ -1,13 +1,13 @@
-# AWS Cloud Practitioner Exam Practice
+# AWS Cert Practice
 
-Local frontend + backend app for practicing the AWS Certified Cloud Practitioner (CLF-C02) exam.
+Local frontend + backend app for practicing AWS certification exams (all 12 active certs as of 2026). Question pools are generated on demand by Claude.
 
 ## Setup
 
 ```bash
-cp .env.example .env       # then fill in ANTHROPIC_API_KEY (not needed yet — generation is stubbed)
-npm install                # installs both workspaces
-npm run dev                # Vite on :5173, Express on :3001 (Vite proxies /api)
+cp .env.example .env       # fill in ANTHROPIC_API_KEY
+npm install
+npm run dev                # Vite on :5173, Express on :3001
 ```
 
 Open http://localhost:5173/.
@@ -17,14 +17,25 @@ Open http://localhost:5173/.
 ```
 backend/   Express + TS API server
 frontend/  React + Vite + TS UI
-data/      JSON files: pools, exams, wrong_questions, attempts
+data/
+  certs.json                              # cert registry (all 12 certs)
+  attempts.json                           # global attempt history
+  certs/{certId}/
+    pools/question_pool_v{N}.json         # generated question pools
+    exams/exam_v{N}.json                  # exam definitions
+    wrong_questions.json                  # per-cert weak-spots pool
 ```
 
-## Question pool / exam versioning
+## How it works
 
-- `data/pools/question_pool_v{N}.json` — pool of questions for exam version N
-- `data/exams/exam_v{N}.json` — exam definition (count, timer, pool ref)
-- `data/wrong_questions.json` — questions you've gotten wrong (powers the Special exam)
-- `data/attempts.json` — every completed attempt with answers, score, per-domain breakdown
+- **Home page** groups certs by level (Foundational / Associate / Professional / Specialty) — see all 12 AWS certs.
+- **Generate** dropdown at top of home: pick a cert, click Generate. Four (or N) parallel Claude calls produce a fresh pool, one per domain, weighted to the official exam's domain split. Pools and exams are versioned per cert (`exam_v1`, `exam_v2`, …).
+- **Exam page** mimics the real exam: countdown timer, multiple-choice / multiple-response questions, flag-for-review, per-attempt question + option shuffle.
+- **Wrong-questions tab** has a per-cert chooser — pick a cert to see your weak spots and take a **Special exam** drawn from just those questions. Answering one correctly removes it from the cert's weak-spots pool.
+- **History tab** lists every attempt across all certs with a cert filter.
 
-The "Generate new pool" button (UI scaffolding ready, Claude call stubbed) will create the next `_v{N+1}` pool + exam pair.
+Question-pool / exam pairs are version-numbered, so retaking `exam_v1` gives you a fresh order even after `exam_v2` exists.
+
+## Costs
+
+Each generation calls Claude (default `claude-sonnet-4-6`) in parallel across the cert's domains. Roughly a few cents per full pool (65–75 questions). Generate at your own discretion.

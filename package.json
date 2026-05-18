@@ -1,8 +1,8 @@
 {
-  "name": "ccp-practice",
+  "name": "aws-cert-practice",
   "private": true,
-  "version": "0.1.0",
-  "description": "AWS Certified Cloud Practitioner exam practice app",
+  "version": "0.2.0",
+  "description": "Practice app for AWS certification exams with Claude-generated question pools",
   "workspaces": [
     "backend",
     "frontend"

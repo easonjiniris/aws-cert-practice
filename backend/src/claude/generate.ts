@@ -1,13 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
 import {
-  poolSchema,
-  questionsArraySchema,
-  type PoolSchema,
+  makePoolSchema,
+  makeQuestionsArraySchema,
   type QuestionWithoutId,
 } from "./schema.js";
 import { buildPerDomainPrompt } from "./prompt.js";
-import { SUBMIT_QUESTIONS_TOOL } from "./tool.js";
-import type { Domain, Question } from "../types.js";
+import { buildSubmitQuestionsTool } from "./tool.js";
+import type { CertSpec, DomainSpec, Question, QuestionPool } from "../types.js";
 
 export class MissingApiKeyError extends Error {
   constructor() {
@@ -17,25 +16,11 @@ export class MissingApiKeyError extends Error {
 }
 
 export class GenerationFailedError extends Error {
-  constructor(message: string, public readonly domain?: Domain) {
+  constructor(message: string, public readonly domain?: string) {
     super(message);
     this.name = "GenerationFailedError";
   }
 }
-
-const ALL_DOMAINS: Domain[] = [
-  "cloud_concepts",
-  "security",
-  "technology",
-  "billing_pricing",
-];
-
-const DEFAULT_WEIGHTS: Record<Domain, number> = {
-  cloud_concepts: 0.24,
-  security: 0.30,
-  technology: 0.34,
-  billing_pricing: 0.12,
-};
 
 let cachedClient: Anthropic | null = null;
 function getClient(): Anthropic {
@@ -48,11 +33,11 @@ function getClient(): Anthropic {
 
 export function domainCounts(
   total: number,
-  weights: Record<Domain, number>
-): Record<Domain, number> {
-  const raw = ALL_DOMAINS.map((d) => {
-    const exact = total * weights[d];
-    return { d, floor: Math.floor(exact), frac: exact - Math.floor(exact) };
+  domains: readonly DomainSpec[]
+): Record<string, number> {
+  const raw = domains.map((d) => {
+    const exact = total * d.weight;
+    return { id: d.id, floor: Math.floor(exact), frac: exact - Math.floor(exact) };
   });
   let assigned = raw.reduce((s, r) => s + r.floor, 0);
   const byFrac = [...raw].sort((a, b) => b.frac - a.frac);
@@ -60,11 +45,11 @@ export function domainCounts(
   while (assigned < total && i < byFrac.length) {
     byFrac[i].floor += 1;
     assigned += 1;
-    i += 1;
+    i = (i + 1) % byFrac.length;
   }
-  const out: Partial<Record<Domain, number>> = {};
-  for (const r of raw) out[r.d] = r.floor;
-  return out as Record<Domain, number>;
+  const out: Record<string, number> = {};
+  for (const r of raw) out[r.id] = r.floor;
+  return out;
 }
 
 interface CallOpts {
@@ -73,59 +58,62 @@ interface CallOpts {
 }
 
 async function callOnce(
-  domain: Domain,
+  cert: CertSpec,
+  domain: DomainSpec,
   count: number,
   extraSystem: string,
   opts: CallOpts
 ): Promise<unknown> {
   const client = getClient();
-  const prompt = buildPerDomainPrompt(domain, count);
-  const system = extraSystem ? `${prompt}\n\n${extraSystem}` : prompt;
+  const prompt = buildPerDomainPrompt(cert, domain, count);
+  const content = extraSystem ? `${prompt}\n\n${extraSystem}` : prompt;
+  const tool = buildSubmitQuestionsTool(cert);
 
   const response = await client.messages.create({
     model: opts.model,
     max_tokens: opts.maxTokens,
-    tools: [SUBMIT_QUESTIONS_TOOL],
-    tool_choice: { type: "tool", name: SUBMIT_QUESTIONS_TOOL.name },
-    messages: [
-      {
-        role: "user",
-        content: system,
-      },
-    ],
+    tools: [tool],
+    tool_choice: { type: "tool", name: tool.name },
+    messages: [{ role: "user", content }],
   });
 
   const toolBlock = response.content.find((b) => b.type === "tool_use");
   if (!toolBlock || toolBlock.type !== "tool_use") {
     throw new GenerationFailedError(
       `Claude did not return a tool_use block (stop_reason=${response.stop_reason})`,
-      domain
+      domain.id
     );
   }
   return (toolBlock as { input: unknown }).input;
 }
 
 export async function generateDomainQuestions(
-  domain: Domain,
+  cert: CertSpec,
+  domain: DomainSpec,
   count: number,
   opts: CallOpts
 ): Promise<QuestionWithoutId[]> {
   if (count <= 0) return [];
 
+  const schema = makeQuestionsArraySchema(cert);
   let lastError: string | null = null;
   for (let attempt = 0; attempt < 2; attempt++) {
-    const extraSystem =
+    const extra =
       attempt === 0
         ? ""
         : `Your previous response failed validation: ${lastError}. Try again, producing EXACTLY ${count} questions and obeying every constraint above.`;
     try {
-      const input = await callOnce(domain, count, extraSystem, opts);
-      if (!input || typeof input !== "object" || !Array.isArray((input as { questions?: unknown }).questions)) {
+      const input = await callOnce(cert, domain, count, extra, opts);
+      if (
+        !input ||
+        typeof input !== "object" ||
+        !Array.isArray((input as { questions?: unknown }).questions)
+      ) {
         lastError = "input did not contain a questions array";
         continue;
       }
-      const rawQuestions = (input as { questions: unknown[] }).questions;
-      const parsed = questionsArraySchema.safeParse(rawQuestions);
+      const raw = (input as { questions: unknown[] }).questions;
+      const parsed = schema.safeParse(raw);
       if (!parsed.success) {
         lastError = parsed.error.issues
           .slice(0, 3)
@@ -137,9 +125,9 @@ export async function generateDomainQuestions(
         lastError = `expected ${count} questions, got ${parsed.data.length}`;
         continue;
       }
-      const wrongDomain = parsed.data.find((q) => q.domain !== domain);
-      if (wrongDomain) {
-        lastError = `at least one question has domain=${wrongDomain.domain}, expected ${domain}`;
+      const wrong = parsed.data.find((q) => q.domain !== domain.id);
+      if (wrong) {
+        lastError = `at least one question has domain=${wrong.domain}, expected ${domain.id}`;
         continue;
       }
       return parsed.data;
@@ -149,20 +137,20 @@ export async function generateDomainQuestions(
       lastError = (err as Error).message;
     }
   }
-
   throw new GenerationFailedError(
-    `Generation for domain "${domain}" failed: ${lastError ?? "unknown error"}`,
-    domain
+    `Generation for domain "${domain.id}" failed: ${lastError ?? "unknown error"}`,
+    domain.id
   );
 }
 
 export interface GenerateInput {
+  cert: CertSpec;
   nextVersion: number;
   questionCount: number;
 }
 
 export interface GenerateOutput {
-  pool: PoolSchema;
+  pool: QuestionPool;
 }
 
 export async function generatePool(input: GenerateInput): Promise<GenerateOutput> {
@@ -171,11 +159,11 @@ export async function generatePool(input: GenerateInput): Promise<GenerateOutput
   const model = process.env.ANTHROPIC_MODEL?.trim() || "claude-sonnet-4-6";
   const maxTokens = Number(process.env.ANTHROPIC_MAX_TOKENS) || 8000;
 
-  const counts = domainCounts(input.questionCount, DEFAULT_WEIGHTS);
+  const counts = domainCounts(input.questionCount, input.cert.domains);
 
   const results = await Promise.all(
-    ALL_DOMAINS.map((d) =>
-      generateDomainQuestions(d, counts[d], { model, maxTokens })
+    input.cert.domains.map((d) =>
+      generateDomainQuestions(input.cert, d, counts[d.id] ?? 0, { model, maxTokens })
     )
   );
 
@@ -184,7 +172,7 @@ export async function generatePool(input: GenerateInput): Promise<GenerateOutput
   for (const arr of results) {
     for (const q of arr) {
       merged.push({
-        id: `v${input.nextVersion}-q${String(idx).padStart(3, "0")}`,
+        id: `${input.cert.id}-v${input.nextVersion}-q${String(idx).padStart(3, "0")}`,
         domain: q.domain,
         difficulty: q.difficulty,
         type: q.type,
@@ -195,22 +183,26 @@ export async function generatePool(input: GenerateInput): Promise<GenerateOutput
     }
   }
 
-  const pool: PoolSchema = {
+  const weights: Record<string, number> = {};
+  for (const d of input.cert.domains) weights[d.id] = d.weight;
+
+  const pool: QuestionPool = {
+    cert_id: input.cert.id,
     version: input.nextVersion,
     created_at: new Date().toISOString(),
-    domain_weights: DEFAULT_WEIGHTS,
+    domain_weights: weights,
     questions: merged,
   };
 
-  const finalCheck = poolSchema.safeParse(pool);
-  if (!finalCheck.success) {
+  const final = makePoolSchema(input.cert).safeParse(pool);
+  if (!final.success) {
     throw new GenerationFailedError(
-      `Final pool failed validation: ${finalCheck.error.issues
+      `Final pool failed validation: ${final.error.issues
         .slice(0, 3)
         .map((i) => `${i.path.join(".")}: ${i.message}`)
         .join("; ")}`
     );
   }
 
-  return { pool: finalCheck.data };
+  return { pool };
 }

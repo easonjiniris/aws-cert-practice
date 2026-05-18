@@ -1,12 +1,12 @@
-import type { Domain, Difficulty } from "../types";
-import { DOMAIN_COLOR, DOMAIN_LABEL } from "../util";
+import type { Difficulty } from "../types";
+import { domainColor } from "../util";
 
-export function DomainBadge({ domain }: { domain: Domain }) {
+export function DomainBadge({ id, label }: { id: string; label: string }) {
   return (
     <span
-      className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${DOMAIN_COLOR[domain]}`}
+      className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${domainColor(id)}`}
     >
-      {DOMAIN_LABEL[domain]}
+      {label}
     </span>
   );
 }

@@ -6,6 +6,7 @@ import { api } from "../api";
 import type {
   AttemptAnswer,
   AttemptRecord,
+  CertSpec,
   Question,
 } from "../types";
 import {
@@ -21,6 +22,7 @@ interface PreparedQuestion {
 }
 
 interface LoadedExam {
+  cert: CertSpec;
   isSpecial: boolean;
   examName: string;
   sourcePoolVersion: number | null;
@@ -43,7 +45,7 @@ function prepareExam(
 }
 
 export function ExamPage() {
-  const params = useParams<{ version: string }>();
+  const params = useParams<{ certId: string; version: string }>();
   const navigate = useNavigate();
   const [loaded, setLoaded] = useState<LoadedExam | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,23 +58,25 @@ export function ExamPage() {
   const submittedRef = useRef(false);
 
   useEffect(() => {
+    const certId = params.certId;
     const versionRaw = params.version;
-    if (!versionRaw) {
-      setError("missing version");
+    if (!certId || !versionRaw) {
+      setError("missing cert or version");
       return;
     }
 
     (async () => {
       try {
         if (versionRaw === "special") {
-          const data = await api.getSpecial();
+          const data = await api.getSpecial(certId);
           if (data.questions.length === 0) {
-            setError("No wrong questions yet — take a regular exam first.");
+            setError("No wrong questions yet for this cert.");
             return;
           }
           startedAtRef.current = Date.now();
           startedIsoRef.current = new Date().toISOString();
           setLoaded({
+            cert: data.cert,
             isSpecial: true,
             examName: "special",
             sourcePoolVersion: null,
@@ -89,10 +93,11 @@ export function ExamPage() {
         }
 
         const version = Number(versionRaw);
-        const data = await api.getExam(version);
+        const data = await api.getExam(certId, version);
         startedAtRef.current = Date.now();
         startedIsoRef.current = new Date().toISOString();
         setLoaded({
+          cert: data.cert,
           isSpecial: false,
           examName: data.exam.name,
           sourcePoolVersion: data.pool.version,
@@ -109,7 +114,7 @@ export function ExamPage() {
         setError((e as Error).message);
       }
     })();
-  }, [params.version]);
+  }, [params.certId, params.version]);
 
   const toggleSelection = (questionId: string, optionId: string, isMulti: boolean) => {
     setSelections((prev) => {
@@ -145,13 +150,14 @@ export function ExamPage() {
       const submittedIso = new Date().toISOString();
       const timeUsed = Math.max(0, Math.floor((Date.now() - startedAtRef.current) / 1000));
 
-      const perDomain = emptyDomainCounts();
+      const perDomain = emptyDomainCounts(loaded.cert);
       let correctTotal = 0;
       const answers: AttemptAnswer[] = loaded.prepared.map((pq, idx) => {
         const q = pq.question;
         const correctIds = q.options.filter((o) => o.is_correct).map((o) => o.id);
         const selectedIds = Array.from(selections[q.id] ?? new Set<string>());
         const isCorrect = selectedIds.length > 0 && arraysEqualAsSets(selectedIds, correctIds);
+        if (!perDomain[q.domain]) perDomain[q.domain] = { correct: 0, total: 0 };
         perDomain[q.domain].total += 1;
         if (isCorrect) {
           perDomain[q.domain].correct += 1;
@@ -172,6 +178,7 @@ export function ExamPage() {
 
       const attempt: AttemptRecord = {
         id: newAttemptId(),
+        cert_id: loaded.cert.id,
         exam: loaded.examName,
         is_special: loaded.isSpecial,
         source_pool_version: loaded.sourcePoolVersion,
@@ -187,10 +194,7 @@ export function ExamPage() {
 
       try {
         await api.submitAttempt(attempt);
-        sessionStorage.setItem(
-          `attempt:${attempt.id}`,
-          JSON.stringify(attempt)
-        );
+        sessionStorage.setItem(`attempt:${attempt.id}`, JSON.stringify(attempt));
         navigate(`/review/${attempt.id}`);
       } catch (e) {
         setError((e as Error).message);
@@ -217,12 +221,17 @@ export function ExamPage() {
   if (!loaded) return <div className="p-6 text-slate-500">Loading exam…</div>;
 
   const pq = loaded.prepared[currentIndex];
-  const answeredCount = loaded.prepared.filter((p) => (selections[p.question.id]?.size ?? 0) > 0).length;
+  const answeredCount = loaded.prepared.filter(
+    (p) => (selections[p.question.id]?.size ?? 0) > 0
+  ).length;
 
   return (
     <div className="mx-auto max-w-4xl p-6">
       <header className="mb-4 flex items-center justify-between">
         <div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            {loaded.cert.code}
+          </div>
           <h1 className="text-xl font-semibold text-slate-900">
             {loaded.isSpecial ? "Special exam — Weak Spots" : loaded.examName}
           </h1>
@@ -241,6 +250,7 @@ export function ExamPage() {
       </header>
 
       <QuestionCard
+        cert={loaded.cert}
         question={pq.question}
         optionOrder={pq.optionOrder}
         selected={selections[pq.question.id] ?? new Set()}
@@ -262,7 +272,7 @@ export function ExamPage() {
           Previous
         </button>
 
-        <div className="flex flex-wrap gap-1">
+        <div className="flex max-w-md flex-wrap justify-center gap-1">
           {loaded.prepared.map((p, i) => {
             const answered = (selections[p.question.id]?.size ?? 0) > 0;
             const isCurrent = i === currentIndex;
