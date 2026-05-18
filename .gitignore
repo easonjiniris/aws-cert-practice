@@ -7,3 +7,9 @@ dist/
 .DS_Store
 .vscode/
 .idea/
+
+# Personal study data — created/updated locally, not pushed.
+# Backend handles missing files gracefully (readAttempts + readWrong
+# default to empty), so a fresh clone runs without these present.
+data/attempts.json
+data/certs/*/wrong_questions.json

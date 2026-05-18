@@ -120,7 +120,11 @@ export async function writeWrong(
 }
 
 export async function readAttempts(): Promise<AttemptsFile> {
-  return readJson<AttemptsFile>(ATTEMPTS_FILE);
+  try {
+    return await readJson<AttemptsFile>(ATTEMPTS_FILE);
+  } catch {
+    return { attempts: [] };
+  }
 }
 export async function writeAttempts(value: AttemptsFile): Promise<void> {
   await writeJsonAtomic(ATTEMPTS_FILE, value);
