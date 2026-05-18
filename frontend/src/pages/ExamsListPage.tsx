@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api";
 import type { CertHomeEntry, CertLevel, HomeResponse } from "../types";
@@ -11,6 +11,8 @@ export function ExamsListPage() {
   const [generating, setGenerating] = useState(false);
   const [genMessage, setGenMessage] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const reload = async () => {
     try {
@@ -35,6 +37,30 @@ export function ExamsListPage() {
     for (const c of data.certs) m.get(c.level)?.push(c);
     return m;
   }, [data]);
+
+  const onImportFile = async (file: File) => {
+    setImporting(true);
+    setGenMessage(null);
+    try {
+      const text = await file.text();
+      let pool: unknown;
+      try {
+        pool = JSON.parse(text);
+      } catch {
+        throw new Error("file is not valid JSON");
+      }
+      const result = await api.importPool(pool);
+      setGenMessage(
+        `Imported ${result.cert_id.toUpperCase()} ${result.name} with ${result.question_count} questions.`
+      );
+      await reload();
+    } catch (e) {
+      setGenMessage(`Import failed: ${(e as Error).message}`);
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const generate = async () => {
     if (!selectedCertId) return;
@@ -61,14 +87,34 @@ export function ExamsListPage() {
     <div className="mx-auto max-w-6xl p-6">
       <div className="mb-6 flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold text-slate-900">Practice exams</h1>
-        <button
-          type="button"
-          onClick={() => setPickerOpen(true)}
-          disabled={generating}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {generating ? "Generating…" : "Generate new pool"}
-        </button>
+        <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void onImportFile(file);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={generating || importing}
+            className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {importing ? "Importing…" : "Import pool"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            disabled={generating || importing}
+            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {generating ? "Generating…" : "Generate new pool"}
+          </button>
+        </div>
       </div>
 
       {generating && (
@@ -76,7 +122,12 @@ export function ExamsListPage() {
           Calling Claude across all domains in parallel — usually 30–90 seconds. Hang on…
         </div>
       )}
-      {!generating && genMessage && (
+      {importing && (
+        <div className="mb-4 rounded border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-800">
+          Importing pool — validating and writing files…
+        </div>
+      )}
+      {!generating && !importing && genMessage && (
         <div className="mb-4 rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
           {genMessage}
         </div>

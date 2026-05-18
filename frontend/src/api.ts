@@ -48,4 +48,9 @@ export const api = {
       `/api/certs/${certId}/generate`,
       { method: "POST", body: JSON.stringify({}) }
     ),
+  importPool: (pool: unknown) =>
+    jsonFetch<{ cert_id: string; version: number; name: string; question_count: number }>(
+      `/api/certs/import`,
+      { method: "POST", body: JSON.stringify({ pool }) }
+    ),
 };
