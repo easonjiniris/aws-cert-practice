@@ -18,7 +18,10 @@ export function ExamsListPage() {
     try {
       const next = await api.getHome();
       setData(next);
-      if (!selectedCertId && next.certs[0]) setSelectedCertId(next.certs[0].id);
+      if (!selectedCertId) {
+        const firstActive = next.certs.find((c) => c.active !== false) ?? next.certs[0];
+        if (firstActive) setSelectedCertId(firstActive.id);
+      }
       setError(null);
     } catch (e) {
       setError((e as Error).message);
@@ -161,11 +164,15 @@ export function ExamsListPage() {
               className="mb-5 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
               autoFocus
             >
-              {data.certs.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code} — {c.name.replace(/^AWS Certified /, "")}
-                </option>
-              ))}
+              {data.certs.map((c) => {
+                const inactive = c.active === false;
+                return (
+                  <option key={c.id} value={c.id} disabled={inactive}>
+                    {c.code} — {c.name.replace(/^AWS Certified /, "")}
+                    {inactive ? " (not active)" : ""}
+                  </option>
+                );
+              })}
             </select>
             <div className="flex justify-end gap-2">
               <button
@@ -209,8 +216,14 @@ export function ExamsListPage() {
 }
 
 function CertCard({ cert }: { cert: CertHomeEntry }) {
+  const inactive = cert.active === false;
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <div
+      className={`rounded-lg border border-slate-200 bg-white p-5 shadow-sm ${
+        inactive ? "opacity-50 grayscale pointer-events-none select-none" : ""
+      }`}
+      aria-disabled={inactive || undefined}
+    >
       <div className="mb-3">
         <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
           {cert.code}

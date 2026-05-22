@@ -2,6 +2,7 @@
   "certs": [
     {
       "id": "ccp",
+      "active": true,
       "name": "AWS Certified Cloud Practitioner",
       "code": "CLF-C02",
       "level": "foundational",
@@ -13,30 +14,31 @@
           "id": "cloud_concepts",
           "name": "Cloud Concepts",
           "weight": 0.24,
-          "description": "Definitions of cloud computing, six advantages of cloud, AWS Cloud Adoption Framework (CAF) perspectives, AWS Well-Architected Framework pillars, cloud economics (CapEx vs OpEx, TCO), high-level AWS global infrastructure (Regions, AZs, Edge Locations, Local Zones, Wavelength, Outposts), and basic AWS migration strategies (the 7 Rs)."
+          "description": "Value proposition of the AWS Cloud and benefits of global infrastructure (speed of deployment, global reach, high availability, elasticity, agility); AWS Well-Architected Framework pillars (operational excellence, security, reliability, performance efficiency, cost optimization, sustainability) and the differences between them; cloud adoption with the AWS Cloud Adoption Framework (AWS CAF) and its benefits (reduced business risk; improved environmental, social, and governance (ESG) performance; increased revenue; increased operational efficiency); migration strategies and supporting resources (for example, database replication, AWS Snowball); cloud economics including fixed vs variable costs, on-premises cost components, licensing strategies (BYOL vs included licenses), rightsizing, automation benefits, and economies of scale."
         },
         {
           "id": "security_compliance",
           "name": "Security and Compliance",
           "weight": 0.30,
-          "description": "AWS shared responsibility model (security OF vs IN the cloud); IAM concepts (users, groups, roles, policies, MFA, root user best practices, IAM Identity Center, federation); compliance and AWS Artifact; encryption services (KMS, CloudHSM, ACM); threat detection and monitoring (GuardDuty, Inspector, Macie, Detective, Security Hub); network security (Security Groups vs NACLs, AWS WAF, Shield, Firewall Manager, Network Firewall); auditing (CloudTrail, AWS Config); secrets management (Secrets Manager, Parameter Store)."
+          "description": "AWS shared responsibility model (security OF vs IN the cloud) and how responsibilities shift across services (for example, Amazon RDS, AWS Lambda, Amazon EC2); compliance and governance using AWS Artifact, AWS Audit Manager, AWS Config, AWS CloudTrail, and Amazon CloudWatch; threat detection and posture services (Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield); encryption options at rest and in transit; identity and access management with AWS IAM (users, groups, custom and managed policies, principle of least privilege, password policies, access keys, MFA, cross-account roles), AWS IAM Identity Center (AWS Single Sign-On), federated identity, root user protection and root-only tasks; credential storage with AWS Secrets Manager and AWS Systems Manager; network and edge protection with AWS WAF, AWS Firewall Manager, AWS Shield, and Amazon GuardDuty; third-party security products available from AWS Marketplace; AWS technical resources for security information (AWS Knowledge Center, AWS Security Center, AWS Security Blog); AWS Trusted Advisor for identifying security issues."
         },
         {
           "id": "cloud_technology",
           "name": "Cloud Technology and Services",
           "weight": 0.34,
-          "description": "Methods of deploying and operating in the AWS Cloud (Console, CLI, SDKs, CloudFormation, CDK, Elastic Beanstalk); global infrastructure mapping to services; core services across compute (EC2, Lambda, ECS, EKS, Fargate, Lightsail, Batch, Auto Scaling, ELB), storage (S3 classes, EBS, EFS, FSx, Storage Gateway, Backup, Snow Family), databases (RDS, Aurora, DynamoDB, ElastiCache, Redshift, Neptune, DocumentDB), networking (VPC, Route 53, CloudFront, Direct Connect, VPN, Transit Gateway, Global Accelerator, API Gateway), application integration (SQS, SNS, EventBridge, Step Functions), analytics (Athena, Glue, Kinesis, EMR, QuickSight), ML/AI (SageMaker, Rekognition, Comprehend, Polly, Translate, Bedrock at a high level), developer tools (CodeCommit, CodeBuild, CodeDeploy, CodePipeline, X-Ray), management and governance (CloudWatch, CloudTrail, Config, Trusted Advisor, Systems Manager, Organizations, Control Tower)."
+          "description": "Methods of provisioning and operating in the AWS Cloud (programmatic access via APIs, SDKs, and AWS CLI; the AWS Management Console; infrastructure as code) and choosing between one-time operations and repeatable processes; cloud, hybrid, and on-premises deployment models; AWS global infrastructure (Regions, Availability Zones, edge locations), achieving high availability via multiple AZs (no shared single points of failure across AZs), and reasons to use multiple Regions (disaster recovery, business continuity, low latency, data sovereignty); compute services including Amazon EC2 instance families (for example, compute optimized, storage optimized), containers (Amazon ECS, Amazon EKS), serverless (AWS Fargate, AWS Lambda), auto scaling for elasticity, and load balancers; database services including relational (Amazon RDS, Amazon Aurora), NoSQL (Amazon DynamoDB), memory-based (Amazon ElastiCache), database migration (AWS DMS, AWS SCT), and choosing between EC2-hosted and managed databases; networking with Amazon VPC (subnets, gateways, network ACLs, security groups), Amazon Inspector for VPC, Amazon Route 53, and connectivity options (AWS VPN, AWS Direct Connect); storage including object (Amazon S3 classes), block (Amazon EBS, instance store), file (Amazon EFS, Amazon FSx), cached file systems (AWS Storage Gateway), lifecycle policies, and AWS Backup; AI/ML and analytics (Amazon SageMaker AI, Amazon Lex, Amazon Kendra, Amazon Athena, Amazon Kinesis, AWS Glue, Amazon QuickSight); application integration (Amazon EventBridge, Amazon SNS, Amazon SQS); business applications (Amazon Connect, Amazon SES); customer enablement (AWS Support); developer tools (AWS CodeBuild, AWS CodePipeline, AWS X-Ray); end-user computing (Amazon AppStream 2.0, Amazon WorkSpaces, Amazon WorkSpaces Secure Browser); frontend and mobile (AWS Amplify, AWS AppSync); and IoT (AWS IoT Core)."
         },
         {
           "id": "billing_pricing_support",
           "name": "Billing, Pricing, and Support",
           "weight": 0.12,
-          "description": "AWS pricing models (On-Demand, Reserved Instances, Savings Plans, Spot, Dedicated Hosts/Instances, free tier); billing and cost-management tools (Billing Dashboard, Cost Explorer, AWS Budgets, Cost & Usage Report, Cost Allocation Tags); AWS Organizations consolidated billing and benefits; AWS Pricing Calculator and Migration Evaluator (TCO); AWS Support plans (Basic, Developer, Business, Enterprise On-Ramp, Enterprise); AWS Marketplace."
+          "description": "AWS compute purchasing options (On-Demand Instances, Reserved Instances, Spot Instances, AWS Savings Plans, Dedicated Hosts, Dedicated Instances, Capacity Reservations) and when to use each; Reserved Instance flexibility and behavior within AWS Organizations; storage pricing options and tiers; data transfer costs (between Regions vs within a Region); billing, budget, and cost-management tools (AWS Budgets, AWS Cost Explorer, AWS Pricing Calculator, AWS Cost and Usage Report, cost allocation tags); AWS Organizations consolidated billing and cost allocation; AWS technical resources (AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post, AWS Support Center) and where to find whitepapers, blogs, and documentation. AWS Support plans as listed in the current CLF-C02 exam guide — AWS Developer Support, AWS Business Support, AWS Enterprise On-Ramp Support, and AWS Enterprise Support (AWS has separately announced these legacy tiers will be replaced by Business Support+, Enterprise Support, and Unified Operations on January 1, 2027, but the current exam guide still names the legacy tiers as the testable plans). AWS Trusted Advisor, AWS Health Dashboard, and the AWS Health API for monitoring and cost optimization; the AWS Trust and Safety team for reporting resource abuse; the AWS Partner Network (independent software vendors, system integrators) and partner benefits (training and certification, partner events, volume discounts); key services of AWS Marketplace (cost management, governance and entitlement); technical assistance options including AWS Professional Services and AWS Solutions Architects."
         }
       ]
     },
     {
       "id": "aip",
+      "active": true,
       "name": "AWS Certified AI Practitioner",
       "code": "AIF-C01",
       "level": "foundational",
@@ -48,36 +50,37 @@
           "id": "ai_ml_fundamentals",
           "name": "Fundamentals of AI and ML",
           "weight": 0.20,
-          "description": "Core AI/ML concepts: supervised vs unsupervised vs reinforcement learning, training/validation/test data, inferencing, common algorithms (regression, classification, clustering), neural networks at a conceptual level. AWS services positioning (SageMaker for full ML lifecycle vs Rekognition/Comprehend/etc. for managed AI). Practical AI/ML use cases."
+          "description": "Core AI/ML terminology (AI, ML, deep learning, neural networks, computer vision, natural language processing, model, algorithm, training and inferencing, bias, fairness, fit, large language models, generative AI, agentic AI) and the similarities and differences between AI, ML, GenAI, deep learning, and agentic AI; types of inferencing (batch, real-time, asynchronous, serverless); data types in AI models (labeled and unlabeled, tabular, time-series, image, text, structured and unstructured); types of learning (supervised, unsupervised, reinforcement). Practical AI use cases (assisting human decision making, scalability, automation); when AI/ML is and is not appropriate (cost-benefit analyses, deterministic-outcome situations); technique selection (regression, classification, clustering); real-world applications (computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting, knowledge bases, agentic AI); AWS managed AI/ML services (Amazon SageMaker AI, Amazon Transcribe, Amazon Translate, Amazon Comprehend, Amazon Lex, Amazon Polly) and choosing between traditional ML models and foundation models based on regulatory concerns, explainability, and operational constraints. The AI/ML development lifecycle: pipeline components, sources of foundation models (open-source pretrained vs custom-trained), production deployment patterns (managed API service vs self-hosted), and AWS services per stage (Amazon Bedrock, Amazon Q, Kiro, Amazon SageMaker AI). ML operations (MLOps): experimentation, repeatable processes, scalable systems, managing technical debt, production readiness, model monitoring, retraining. Model-performance metrics (accuracy, precision, recall, F1 score) and business metrics (cost per user, development costs, customer feedback, ROI)."
         },
         {
           "id": "generative_ai_fundamentals",
           "name": "Fundamentals of Generative AI",
           "weight": 0.24,
-          "description": "Foundation models, large language models, transformer architecture at a conceptual level, tokens and context windows, prompt engineering basics, embeddings and vector databases, retrieval-augmented generation (RAG), fine-tuning vs prompt engineering vs RAG trade-offs, evaluation of generative outputs."
+          "description": "Foundational GenAI concepts: tokens, chunking, embeddings, vectors, prompt engineering, transformer-based large language models (LLMs), foundation models (FMs), multi-modal models, diffusion models. GenAI use cases including image, video, and audio generation; summarization; AI assistants; translation; code generation; customer service agents; search; and recommendation engines. The FM lifecycle (data selection, model selection, pre-training, fine-tuning, evaluation, deployment, feedback), token-based pricing and its effect on cost and performance for inference, and the role of context engineering in FM applications. Agentic AI concepts: multi-agent system patterns for complex AI applications, the Model Context Protocol (MCP) and its role in connecting agents to external systems, multi-agent communication patterns, memory management, tool usage, and workflow orchestration. Capabilities of GenAI (adaptability, responsiveness, conversational ability, content generation) versus its limitations (hallucinations, interpretability, inaccuracy, nondeterminism); factors for selecting GenAI models (model types, performance requirements, capabilities, constraints, compliance, cost, latency, complexity); business value and metrics (cross-domain performance, ROI, efficiency, conversion rate, average revenue per user, accuracy, customer lifetime value). AWS GenAI infrastructure and services: Amazon Bedrock, Amazon SageMaker AI, SageMaker JumpStart, Amazon Q, Kiro, Strands Agents, Amazon Bedrock AgentCore; advantages of building on AWS (accessibility, lower barrier to entry, efficiency, cost-effectiveness, speed to market, security, compliance, responsibility, safety); cost trade-offs (responsiveness, availability, redundancy, performance, regional coverage, token-based pricing, provisioned throughput, custom models)."
         },
         {
           "id": "foundation_model_applications",
           "name": "Applications of Foundation Models",
           "weight": 0.28,
-          "description": "Amazon Bedrock (model providers, model selection, Knowledge Bases, Agents, Guardrails); Amazon Q (Business, Developer); SageMaker JumpStart; building generative AI applications on AWS; integrating with data sources; cost considerations; agent workflows."
+          "description": "Design considerations for FM-based applications: selection criteria (cost, modality, latency, multi-lingual support, model size, complexity, customization, input/output length, prompt caching); inference parameters (temperature, input/output length) and their effect on responses; Retrieval Augmented Generation (RAG) with Amazon Bedrock Knowledge Bases; AWS services for storing embeddings in vector databases (Amazon OpenSearch Service, Amazon Aurora, Amazon Neptune, Amazon RDS for PostgreSQL); cost trade-offs across customization approaches (pre-training, fine-tuning, in-context learning, RAG, model distillation); the role of AI agents and their business applications. Prompt engineering: concepts and constructs (context, instruction, negative prompts); techniques (chain-of-thought, zero-shot, single-shot, few-shot, prompt templates); benefits and best practices (response quality, experimentation, guardrails, specificity, concision); risks and limitations (exposure, poisoning, hijacking, jailbreaking); prompt versioning and management with Amazon Bedrock Prompt Management. Training and fine-tuning: pre-training, fine-tuning, continuous pre-training, distillation; fine-tuning methods (instruction tuning, domain adaptation, transfer learning, continuous pre-training); data preparation for fine-tuning (curation, governance, sizing, labeling, representativeness, reinforcement learning from human feedback (RLHF)). Methods to evaluate FM performance: human-in-the-loop evaluation, benchmark datasets, Amazon Bedrock Model Evaluation; metrics including ROUGE, BLEU, BERTScore, LLM-as-a-judge; assessing whether an FM meets business objectives; evaluation of FM-based applications (RAG, agents, workflows); alignment metrics (task completion rate, user satisfaction, cost per interaction)."
         },
         {
           "id": "responsible_ai",
           "name": "Guidelines for Responsible AI",
           "weight": 0.14,
-          "description": "Bias and fairness in ML models, transparency and explainability, AWS AI Service Cards, model card concepts, hallucination mitigation in generative AI, human-in-the-loop review (Amazon Augmented AI / A2I), Bedrock Guardrails for content filtering, dataset documentation."
+          "description": "Features of responsible AI: bias, fairness, inclusivity, robustness, safety, veracity. Tools to identify and enforce responsible AI features (for example, Amazon Bedrock Guardrails). Responsible model-selection practices including environmental considerations and sustainability. Legal risks of working with GenAI (intellectual property infringement claims, biased model outputs, loss of customer trust, end-user risk, hallucinations). Characteristics of well-constructed datasets (inclusivity, diversity, curated data sources, balanced datasets) and effects of bias and variance (impacts on demographic groups, inaccuracy, overfitting, underfitting). Tools to detect and monitor bias, trustworthiness, and truthfulness (label-quality analysis, human audits, subgroup analysis, Amazon SageMaker Clarify, Amazon SageMaker Model Monitor, Amazon Augmented AI (Amazon A2I)). Transparency and explainability: differences between transparent/explainable models and opaque models; tools to support transparency and explainability (Amazon SageMaker Model Cards, SageMaker Clarify, Amazon Bedrock Model Evaluations, open-source models, data, licensing); trade-offs between model safety and transparency (interpretability vs performance); principles of human-centered design for explainable AI (user-feedback mechanisms, AI decision transparency)."
         },
         {
           "id": "ai_security_governance",
           "name": "Security, Compliance, and Governance for AI Solutions",
           "weight": 0.14,
-          "description": "Data privacy with foundation models (no training on inputs by default in Bedrock), IAM for AI services, VPC endpoints for Bedrock/SageMaker, encryption of training data and models, audit trails via CloudTrail, AWS compliance programs relevant to AI workloads, customer responsibility for prompt content and model outputs."
+          "description": "AWS services and features to secure AI systems: IAM roles, policies, and permissions; encryption at rest and in transit; Amazon Macie; AWS PrivateLink; the AWS shared responsibility model; Amazon Bedrock AgentCore Identity; Policy in AgentCore; Amazon Bedrock Guardrails. Source citation and documenting data origins (data lineage, data cataloging, Amazon SageMaker Model Cards). Best practices for secure data engineering (data-quality assessment, privacy-enhancing technologies, data access control, data integrity). Security and privacy considerations for AI systems: application security, threat detection, vulnerability management, infrastructure protection, prompt injection, encryption at rest and in transit, data leakage prevention, output filtering and validation, audit trail and logging requirements for AI interactions, toxicity. Hallucination detection and grounding techniques to improve output accuracy (RAG grounding, output validation, confidence scoring). Governance and compliance services (AWS Config, Amazon Inspector, AWS Audit Manager, AWS Artifact, AWS CloudTrail, AWS Trusted Advisor). Data governance strategies (data lifecycles, logging, residency, monitoring, observation, retention). Governance processes and frameworks: policies, review cadence and strategies, governance frameworks including the Generative AI Security Scoping Matrix, transparency standards, team training requirements."
         }
       ]
     },
     {
       "id": "saa",
+      "active": false,
       "name": "AWS Certified Solutions Architect – Associate",
       "code": "SAA-C03",
       "level": "associate",
@@ -113,6 +116,7 @@
     },
     {
       "id": "dva",
+      "active": false,
       "name": "AWS Certified Developer – Associate",
       "code": "DVA-C02",
       "level": "associate",
@@ -148,6 +152,7 @@
     },
     {
       "id": "soa",
+      "active": false,
       "name": "AWS Certified SysOps Administrator – Associate",
       "code": "SOA-C02",
       "level": "associate",
@@ -195,6 +200,7 @@
     },
     {
       "id": "dea",
+      "active": false,
       "name": "AWS Certified Data Engineer – Associate",
       "code": "DEA-C01",
       "level": "associate",
@@ -230,6 +236,7 @@
     },
     {
       "id": "mla",
+      "active": false,
       "name": "AWS Certified Machine Learning Engineer – Associate",
       "code": "MLA-C01",
       "level": "associate",
@@ -265,6 +272,7 @@
     },
     {
       "id": "sap",
+      "active": false,
       "name": "AWS Certified Solutions Architect – Professional",
       "code": "SAP-C02",
       "level": "professional",
@@ -300,6 +308,7 @@
     },
     {
       "id": "dop",
+      "active": false,
       "name": "AWS Certified DevOps Engineer – Professional",
       "code": "DOP-C02",
       "level": "professional",
@@ -347,6 +356,7 @@
     },
     {
       "id": "ans",
+      "active": false,
       "name": "AWS Certified Advanced Networking – Specialty",
       "code": "ANS-C01",
       "level": "specialty",
@@ -382,6 +392,7 @@
     },
     {
       "id": "scs",
+      "active": false,
       "name": "AWS Certified Security – Specialty",
       "code": "SCS-C02",
       "level": "specialty",
@@ -429,6 +440,7 @@
     },
     {
       "id": "mls",
+      "active": false,
       "name": "AWS Certified Machine Learning – Specialty",
       "code": "MLS-C01",
       "level": "specialty",
@@ -458,7 +470,7 @@
           "id": "ml_implementation_operations",
           "name": "Machine Learning Implementation and Operations",
           "weight": 0.20,
-          "description": "Deploying models with SageMaker endpoints (real-time, serverless, asynchronous, batch transform, multi-model, multi-container endpoints); CI/CD for ML with SageMaker Pipelines and SageMaker Projects; A/B testing and shadow testing; auto-scaling endpoints; model monitoring with Model Monitor and Clarify (data drift, concept drift, bias drift); model retraining workflows; cost optimization (instance right-sizing, Inferentia/Trainium, serverless inference); security and compliance (IAM, VPC mode, KMS, network isolation)."
+          "description": "Deploying models with SageMaker endpoints (real-time, serverless, asynchronous, batch transform, multi-model, multi-container endpoints); CI/CD for ML with SageMaker Pipelines and SageMaker Projects; A/B testing and shadow testing; auto-scaling endpoints and managing GPU instances; SageMaker Model Monitor and Clarify for data drift, concept drift, bias drift; model retraining workflows; cost optimization (instance right-sizing, Inferentia/Trainium, serverless inference); security and compliance (IAM, VPC mode, KMS, network isolation)."
         }
       ]
     }

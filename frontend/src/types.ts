@@ -18,6 +18,7 @@ export interface CertSpec {
   time_limit_seconds: number;
   pass_score: number;
   domains: DomainSpec[];
+  active?: boolean;
 }
 
 export interface QuestionOption {
