@@ -243,18 +243,45 @@ function CertCard({ cert }: { cert: CertHomeEntry }) {
             No pools yet — click Generate new pool above and pick this cert.
           </div>
         ) : (
-          <ul className="space-y-1">
-            {cert.exams.map((exam) => (
-              <li key={exam.version}>
-                <Link
-                  to={`/exam/${cert.id}/${exam.version}`}
-                  className="flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm hover:border-sky-400 hover:bg-sky-50"
-                >
-                  <span className="font-medium text-slate-800">{exam.name}</span>
-                  <span className="text-xs text-slate-500">{exam.question_count}q</span>
-                </Link>
-              </li>
-            ))}
+          <ul className="max-h-64 space-y-1 overflow-y-auto pr-1">
+            {cert.exams.map((exam) => {
+              const latest = exam.latest_attempt;
+              const attempted = latest !== null;
+              const passed = latest?.passed === true;
+              const containerClass = attempted
+                ? passed
+                  ? "border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100"
+                  : "border-amber-300 bg-amber-50 hover:border-amber-400 hover:bg-amber-100"
+                : "border-slate-200 bg-slate-50 hover:border-sky-400 hover:bg-sky-50";
+              const titleClass = attempted
+                ? passed
+                  ? "text-emerald-900"
+                  : "text-amber-900"
+                : "text-slate-800";
+              const pctClass = attempted
+                ? passed
+                  ? "text-emerald-700"
+                  : "text-amber-700"
+                : "text-slate-500";
+              return (
+                <li key={exam.version}>
+                  <Link
+                    to={`/exam/${cert.id}/${exam.version}`}
+                    className={`flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm ${containerClass}`}
+                  >
+                    <span className={`font-medium ${titleClass}`}>{exam.name}</span>
+                    <span className="flex items-center gap-2 text-xs">
+                      {latest && (
+                        <span className={`font-semibold ${pctClass}`}>
+                          {Math.round(latest.score * 100)}%
+                        </span>
+                      )}
+                      <span className="text-slate-500">{exam.question_count}q</span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

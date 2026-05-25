@@ -77,8 +77,16 @@ export interface SpecialExamResponse {
   questions: Question[];
 }
 
+export interface ExamHomeEntry extends ExamDefinition {
+  latest_attempt: {
+    score: number;
+    passed: boolean;
+    submitted_at: string;
+  } | null;
+}
+
 export interface CertHomeEntry extends CertSpec {
-  exams: ExamDefinition[];
+  exams: ExamHomeEntry[];
   special: { available: boolean; wrong_question_count: number };
 }
 

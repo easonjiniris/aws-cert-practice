@@ -3,11 +3,16 @@ import {
   listExamVersions,
   loadCert,
   loadCerts,
+  readAttempts,
   readExam,
   readPool,
   readWrong,
 } from "../storage.js";
-import type { CertSpec, ExamDefinition } from "../types.js";
+import type {
+  AttemptRecord,
+  CertSpec,
+  ExamDefinition,
+} from "../types.js";
 
 export const certsRouter = Router();
 
@@ -20,17 +25,46 @@ certsRouter.get("/certs", async (_req, res) => {
   }
 });
 
-async function summarizeExams(cert: CertSpec): Promise<ExamDefinition[]> {
+interface ExamHomeEntry extends ExamDefinition {
+  latest_attempt: {
+    score: number;
+    passed: boolean;
+    submitted_at: string;
+  } | null;
+}
+
+async function summarizeExams(
+  cert: CertSpec,
+  attempts: AttemptRecord[]
+): Promise<ExamHomeEntry[]> {
   const versions = (await listExamVersions(cert.id)).slice().reverse();
-  return Promise.all(versions.map((v) => readExam(cert.id, v)));
+  const defs = await Promise.all(versions.map((v) => readExam(cert.id, v)));
+  return defs.map((def) => {
+    let latest: AttemptRecord | null = null;
+    for (const a of attempts) {
+      if (a.cert_id !== cert.id || a.is_special || a.exam !== def.name) continue;
+      if (!latest || a.submitted_at > latest.submitted_at) latest = a;
+    }
+    return {
+      ...def,
+      latest_attempt: latest
+        ? {
+            score: latest.score,
+            passed: latest.passed,
+            submitted_at: latest.submitted_at,
+          }
+        : null,
+    };
+  });
 }
 
 certsRouter.get("/home", async (_req, res) => {
   try {
     const certs = await loadCerts();
+    const attemptsFile = await readAttempts();
     const enriched = await Promise.all(
       certs.map(async (cert) => {
-        const exams = await summarizeExams(cert);
+        const exams = await summarizeExams(cert, attemptsFile.attempts);
         const wrong = await readWrong(cert.id);
         return {
           ...cert,
