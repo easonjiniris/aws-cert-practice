@@ -322,23 +322,38 @@ export function ExamPage() {
           })}
         </div>
 
-        <div className="flex gap-2">
-          {currentIndex < loaded.prepared.length - 1 && (
-            <button
-              onClick={() => setCurrentIndex((i) => Math.min(loaded.prepared.length - 1, i + 1))}
-              className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-            >
-              Next
-            </button>
-          )}
-          {(loaded.isSpecial || currentIndex === loaded.prepared.length - 1) && (
-            <button
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
-            >
-              {loaded.isSpecial ? "Submit" : "Submit exam"}
-            </button>
+        <div className="flex flex-col items-end gap-1">
+          <div className="flex gap-2">
+            {currentIndex < loaded.prepared.length - 1 && (
+              <button
+                onClick={() => setCurrentIndex((i) => Math.min(loaded.prepared.length - 1, i + 1))}
+                className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+              >
+                Next
+              </button>
+            )}
+            {(loaded.isSpecial || currentIndex === loaded.prepared.length - 1) && (
+              <button
+                onClick={handleSubmit}
+                disabled={
+                  submitting ||
+                  (!loaded.isSpecial && answeredCount < loaded.prepared.length)
+                }
+                title={
+                  !loaded.isSpecial && answeredCount < loaded.prepared.length
+                    ? `${loaded.prepared.length - answeredCount} question(s) still unanswered`
+                    : undefined
+                }
+                className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loaded.isSpecial ? "Submit" : "Submit exam"}
+              </button>
+            )}
+          </div>
+          {!loaded.isSpecial && answeredCount < loaded.prepared.length && (
+            <div className="text-xs text-slate-500">
+              {loaded.prepared.length - answeredCount} unanswered — answer all to submit
+            </div>
           )}
         </div>
       </div>

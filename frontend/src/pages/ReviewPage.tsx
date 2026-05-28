@@ -123,7 +123,8 @@ export function ReviewPage() {
       </div>
       <ol className="space-y-4">
         {attempt.answers.map((a, idx) => {
-          if (wrongOnly && a.is_correct) return null;
+          const isIncomplete = a.selected_option_ids.length === 0;
+          if (wrongOnly && (a.is_correct || isIncomplete)) return null;
           const q = byId.get(a.question_id);
           if (!q) {
             return (
@@ -137,12 +138,21 @@ export function ReviewPage() {
           }
           const correctIds = new Set(q.options.filter((o) => o.is_correct).map((o) => o.id));
           const selectedIds = new Set(a.selected_option_ids);
+          const borderClass = isIncomplete
+            ? "border-amber-200"
+            : a.is_correct
+              ? "border-emerald-200"
+              : "border-red-200";
+          const badgeClass = isIncomplete
+            ? "bg-amber-100 text-amber-800"
+            : a.is_correct
+              ? "bg-emerald-100 text-emerald-800"
+              : "bg-red-100 text-red-800";
+          const badgeLabel = isIncomplete ? "Incomplete" : a.is_correct ? "Correct" : "Incorrect";
           return (
             <li
               key={a.question_id}
-              className={`rounded-lg border p-5 shadow-sm ${
-                a.is_correct ? "border-emerald-200 bg-white" : "border-red-200 bg-white"
-              }`}
+              className={`rounded-lg border p-5 shadow-sm ${borderClass} bg-white`}
             >
               <div className="mb-2 flex items-center justify-between text-sm text-slate-500">
                 <span>Question {idx + 1}</span>
@@ -150,11 +160,9 @@ export function ReviewPage() {
                   <DomainBadge id={q.domain} label={domainName(cert, q.domain)} />
                   <DifficultyBadge difficulty={q.difficulty} />
                   <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                      a.is_correct ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"
-                    }`}
+                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badgeClass}`}
                   >
-                    {a.is_correct ? "Correct" : "Incorrect"}
+                    {badgeLabel}
                   </span>
                 </div>
               </div>
