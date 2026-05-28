@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api";
 import type { CertHomeEntry, CertLevel, HomeResponse } from "../types";
-import { CERT_LEVEL_LABEL, CERT_LEVELS, formatTime } from "../util";
+import { CERT_LEVEL_LABEL, CERT_LEVELS, formatTime, scoreColorScale } from "../util";
 
 export function ExamsListPage() {
   const [data, setData] = useState<HomeResponse | null>(null);
@@ -247,22 +247,14 @@ function CertCard({ cert }: { cert: CertHomeEntry }) {
             {cert.exams.map((exam) => {
               const latest = exam.latest_attempt;
               const attempted = latest !== null;
-              const passed = latest?.passed === true;
-              const containerClass = attempted
-                ? passed
-                  ? "border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100"
-                  : "border-amber-300 bg-amber-50 hover:border-amber-400 hover:bg-amber-100"
+              const scoreColors = attempted
+                ? scoreColorScale(latest.score, cert.pass_score)
+                : null;
+              const containerClass = scoreColors
+                ? scoreColors.container
                 : "border-slate-200 bg-slate-50 hover:border-sky-400 hover:bg-sky-50";
-              const titleClass = attempted
-                ? passed
-                  ? "text-emerald-900"
-                  : "text-amber-900"
-                : "text-slate-800";
-              const pctClass = attempted
-                ? passed
-                  ? "text-emerald-700"
-                  : "text-amber-700"
-                : "text-slate-500";
+              const titleClass = scoreColors ? scoreColors.title : "text-slate-800";
+              const pctClass = scoreColors ? scoreColors.pct : "text-slate-500";
               return (
                 <li key={exam.version}>
                   <Link

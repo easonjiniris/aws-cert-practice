@@ -64,6 +64,42 @@ export function domainColor(domainId: string): string {
   return PALETTE[hash(domainId) % PALETTE.length];
 }
 
+export type ScoreColors = { container: string; title: string; pct: string };
+
+// Grade an attempt on a red→amber→green scale, anchored to the cert's pass
+// threshold so "passing" always lands in green-ish bands regardless of cert.
+export function scoreColorScale(score: number, passScore: number): ScoreColors {
+  const bands: { min: number; colors: ScoreColors }[] = [
+    {
+      // comfortably above pass (>= pass + 10pts): green
+      min: passScore + 0.1,
+      colors: {
+        container: "border-green-300 bg-green-50 hover:border-green-400 hover:bg-green-100",
+        title: "text-green-900",
+        pct: "text-green-700",
+      },
+    },
+    {
+      // just passing (>= pass, within 10pts): amber
+      min: passScore,
+      colors: {
+        container: "border-amber-300 bg-amber-50 hover:border-amber-400 hover:bg-amber-100",
+        title: "text-amber-900",
+        pct: "text-amber-700",
+      },
+    },
+  ];
+  for (const band of bands) {
+    if (score >= band.min) return band.colors;
+  }
+  // failing (below pass): rose
+  return {
+    container: "border-rose-300 bg-rose-50 hover:border-rose-400 hover:bg-rose-100",
+    title: "text-rose-900",
+    pct: "text-rose-700",
+  };
+}
+
 export const CERT_LEVELS: CertLevel[] = [
   "foundational",
   "associate",

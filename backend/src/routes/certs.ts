@@ -7,6 +7,7 @@ import {
   readExam,
   readPool,
   readWrong,
+  resolveQuestions,
 } from "../storage.js";
 import type {
   AttemptRecord,
@@ -111,7 +112,17 @@ certsRouter.get("/certs/:certId/wrong-questions", async (req, res) => {
       return;
     }
     const wrong = await readWrong(cert.id);
-    res.json({ cert, ...wrong });
+    // Overlay live pool data onto each entry's snapshot so updates to the
+    // pool (text/options/reasons) appear immediately on the weak-spots page.
+    const live = await resolveQuestions(
+      cert.id,
+      wrong.questions.map((q) => q.question_id)
+    );
+    const questions = wrong.questions.map((entry) => ({
+      ...entry,
+      snapshot: live.get(entry.question_id) ?? entry.snapshot,
+    }));
+    res.json({ cert, questions });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }
@@ -125,17 +136,26 @@ certsRouter.get("/certs/:certId/special-exam", async (req, res) => {
       return;
     }
     const wrong = await readWrong(cert.id);
+    const live = await resolveQuestions(
+      cert.id,
+      wrong.questions.map((q) => q.question_id)
+    );
+    // Prefer the live pool version; fall back to the on-disk snapshot if the
+    // source pool was deleted.
+    const questions = wrong.questions.map(
+      (q) => live.get(q.question_id) ?? q.snapshot
+    );
     res.json({
       cert,
       exam: {
         name: "special",
-        question_count: wrong.questions.length,
+        question_count: questions.length,
         time_limit_seconds: 0,
         pass_score: 0,
         shuffle_options: true,
         is_special: true,
       },
-      questions: wrong.questions.map((q) => q.snapshot),
+      questions,
     });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });

@@ -11,30 +11,17 @@ export function ReviewPage() {
   const [cert, setCert] = useState<CertSpec | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const [questions, setQuestions] = useState<Question[]>([]);
+
   useEffect(() => {
     if (!attemptId) return;
     (async () => {
       try {
-        let found: AttemptRecord | null = null;
-        const cached = sessionStorage.getItem(`attempt:${attemptId}`);
-        if (cached) {
-          try {
-            found = JSON.parse(cached) as AttemptRecord;
-          } catch {
-            /* fall through */
-          }
-        }
-        if (!found) {
-          const data = await api.getAttempts();
-          found = data.attempts.find((a) => a.id === attemptId) ?? null;
-        }
-        if (!found) {
-          setError("attempt not found");
-          return;
-        }
-        setAttempt(found);
+        const detail = await api.getAttempt(attemptId);
+        setAttempt(detail.attempt);
+        setQuestions(detail.questions);
         const list = await api.listCerts();
-        setCert(list.certs.find((c) => c.id === found!.cert_id) ?? null);
+        setCert(list.certs.find((c) => c.id === detail.attempt.cert_id) ?? null);
       } catch (e) {
         setError((e as Error).message);
       }
@@ -53,9 +40,12 @@ export function ReviewPage() {
   }
   if (!attempt || !cert) return <div className="p-6 text-slate-500">Loading…</div>;
 
-  const snapshots: Question[] = attempt.question_snapshots ?? [];
-  const byId = new Map(snapshots.map((q) => [q.id, q]));
+  const byId = new Map(questions.map((q) => [q.id, q]));
   const percent = Math.round(attempt.score * 100);
+  const total = attempt.answers.length;
+  const answered = attempt.answers.filter((a) => a.selected_option_ids.length > 0).length;
+  const correctCount = attempt.answers.filter((a) => a.is_correct).length;
+  const notAnswered = total - answered;
 
   return (
     <div className="mx-auto max-w-4xl p-6">
@@ -84,7 +74,18 @@ export function ReviewPage() {
                   ? "Passed"
                   : "Did not pass"}
             </div>
-            <div className="text-4xl font-bold text-slate-900">{percent}%</div>
+            {attempt.is_special ? (
+              <>
+                <div className="text-4xl font-bold text-slate-900">
+                  {correctCount}/{answered} · {notAnswered}
+                </div>
+                <div className="text-xs uppercase tracking-wide text-slate-500">
+                  correct / answered · not answered
+                </div>
+              </>
+            ) : (
+              <div className="text-4xl font-bold text-slate-900">{percent}%</div>
+            )}
             <div className="text-sm text-slate-600">
               {attempt.exam} · {formatTime(attempt.time_used_seconds)} used ·{" "}
               {new Date(attempt.submitted_at).toLocaleString()}
@@ -117,7 +118,7 @@ export function ReviewPage() {
                 key={a.question_id}
                 className="rounded-lg border border-slate-200 bg-white p-5 text-sm text-slate-500"
               >
-                Question snapshot unavailable for {a.question_id}
+                Question unavailable for {a.question_id} — its source pool may have been removed.
               </li>
             );
           }

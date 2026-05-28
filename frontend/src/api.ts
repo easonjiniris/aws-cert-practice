@@ -1,4 +1,5 @@
 import type {
+  AttemptDetailResponse,
   AttemptRecord,
   CertsListResponse,
   ExamFetchResponse,
@@ -38,6 +39,8 @@ export const api = {
   getWrong: (certId: string) =>
     jsonFetch<WrongQuestionsResponse>(`/api/certs/${certId}/wrong-questions`),
   getAttempts: () => jsonFetch<{ attempts: AttemptRecord[] }>("/api/attempts"),
+  getAttempt: (id: string) =>
+    jsonFetch<AttemptDetailResponse>(`/api/attempt/${encodeURIComponent(id)}`),
   submitAttempt: (attempt: AttemptRecord) =>
     jsonFetch<{ ok: true; attempt_id: string }>("/api/attempt", {
       method: "POST",

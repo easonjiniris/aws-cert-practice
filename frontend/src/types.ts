@@ -134,5 +134,9 @@ export interface AttemptRecord {
   passed: boolean;
   per_domain: Record<string, { correct: number; total: number }>;
   answers: AttemptAnswer[];
-  question_snapshots?: Question[];
+}
+
+export interface AttemptDetailResponse {
+  attempt: AttemptRecord;
+  questions: Question[];
 }

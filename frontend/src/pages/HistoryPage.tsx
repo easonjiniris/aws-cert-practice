@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api";
 import type { AttemptRecord, CertSpec } from "../types";
-import { formatTime } from "../util";
+import { formatTime, scoreColorScale } from "../util";
 
 export function HistoryPage() {
   const [attempts, setAttempts] = useState<AttemptRecord[] | null>(null);
@@ -91,8 +91,37 @@ export function HistoryPage() {
                     <td className="px-4 py-3 font-medium text-slate-900">
                       {a.is_special ? "Special" : a.exam}
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-800">
-                      {Math.round(a.score * 100)}%
+                    <td className="px-4 py-3">
+                      {a.is_special ? (
+                        (() => {
+                          const total = a.answers.length;
+                          const answered = a.answers.filter(
+                            (x) => x.selected_option_ids.length > 0
+                          ).length;
+                          const correctCount = a.answers.filter((x) => x.is_correct).length;
+                          const notAnswered = total - answered;
+                          return (
+                            <span className="font-mono text-slate-800">
+                              {correctCount}/{answered} · {notAnswered}
+                            </span>
+                          );
+                        })()
+                      ) : !cert ? (
+                        <span className="font-mono text-slate-800">
+                          {Math.round(a.score * 100)}%
+                        </span>
+                      ) : (
+                        (() => {
+                          const colors = scoreColorScale(a.score, cert.pass_score);
+                          return (
+                            <span
+                              className={`inline-block rounded-md border px-2 py-0.5 font-mono font-semibold ${colors.container} ${colors.pct}`}
+                            >
+                              {Math.round(a.score * 100)}%
+                            </span>
+                          );
+                        })()
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       {a.is_special ? (

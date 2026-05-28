@@ -3,6 +3,7 @@ import {
   readAttempts,
   readPool,
   readWrong,
+  resolveQuestions,
   writeAttempts,
   writeWrong,
 } from "../storage.js";
@@ -23,13 +24,38 @@ attemptsRouter.get("/attempts", async (_req, res) => {
   }
 });
 
+// Fetch one attempt joined with the live question data resolved from the
+// current pools. ReviewPage uses this so any pool edits (e.g. better reason
+// text) appear in history immediately instead of being baked in at submit time.
+attemptsRouter.get("/attempt/:id", async (req, res) => {
+  try {
+    const attempts = await readAttempts();
+    const attempt = attempts.attempts.find((a) => a.id === req.params.id);
+    if (!attempt) {
+      res.status(404).json({ error: "attempt not found" });
+      return;
+    }
+    const ids = attempt.answers.map((a) => a.question_id);
+    const lookup = await resolveQuestions(attempt.cert_id, ids);
+    const questions = ids
+      .map((id) => lookup.get(id))
+      .filter((q): q is Question => q != null);
+    res.json({ attempt, questions });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 attemptsRouter.post("/attempt", async (req, res) => {
   try {
-    const attempt = req.body as AttemptRecord;
-    if (!attempt || typeof attempt !== "object" || !attempt.id || !attempt.cert_id) {
+    const body = req.body as Partial<AttemptRecord> & { question_snapshots?: unknown };
+    if (!body || typeof body !== "object" || !body.id || !body.cert_id) {
       res.status(400).json({ error: "invalid attempt body (missing id or cert_id)" });
       return;
     }
+    // Strip question_snapshots — we resolve live from the pool now.
+    const { question_snapshots: _ignored, ...rest } = body;
+    const attempt = rest as AttemptRecord;
 
     const attempts = await readAttempts();
     attempts.attempts.push(attempt);
@@ -64,6 +90,9 @@ attemptsRouter.post("/attempt", async (req, res) => {
           existing.times_wrong += 1;
           existing.last_wrong_at = attempt.submitted_at;
         } else {
+          // Snapshot is kept for back-compat on disk but is no longer the
+          // source of truth — wrong-questions/special-exam endpoints overlay
+          // live pool data on top. Skip writing if no pool found.
           const snapshot = questionLookup?.get(a.question_id);
           if (!snapshot) continue;
           const entry: WrongQuestionEntry = {

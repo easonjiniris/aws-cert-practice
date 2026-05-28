@@ -14,6 +14,7 @@ import type {
   CertSpec,
   CertsFile,
   ExamDefinition,
+  Question,
   QuestionPool,
   WrongQuestionsFile,
 } from "./types.js";
@@ -117,6 +118,45 @@ export async function writeWrong(
 ): Promise<void> {
   await ensureCertDir(certId);
   await writeJsonAtomic(wrongFile(certId), value);
+}
+
+/**
+ * Resolve a set of question_ids to their current Question objects by reading
+ * from each id's source pool (the version is encoded in the id, e.g.
+ * "ccp-v6-q012"). This is the dynamic linkage that replaces baked-in attempt
+ * snapshots: history always reflects the current pool's stem/options/reasons.
+ *
+ * Returns a Map keyed by question_id. Ids whose pool no longer exists, or
+ * whose pool no longer contains the id, are simply omitted.
+ */
+export async function resolveQuestions(
+  certId: string,
+  questionIds: readonly string[]
+): Promise<Map<string, Question>> {
+  const byVersion = new Map<number, Set<string>>();
+  const idPattern = new RegExp(`^${certId}-v(\\d+)-q\\d+$`);
+  for (const id of questionIds) {
+    const m = idPattern.exec(id);
+    if (!m) continue;
+    const v = Number(m[1]);
+    const set = byVersion.get(v) ?? new Set<string>();
+    set.add(id);
+    byVersion.set(v, set);
+  }
+  const out = new Map<string, Question>();
+  await Promise.all(
+    Array.from(byVersion.entries()).map(async ([version, wanted]) => {
+      try {
+        const pool = await readPool(certId, version);
+        for (const q of pool.questions) {
+          if (wanted.has(q.id)) out.set(q.id, q);
+        }
+      } catch {
+        // pool missing — skip its ids
+      }
+    })
+  );
+  return out;
 }
 
 export async function readAttempts(): Promise<AttemptsFile> {

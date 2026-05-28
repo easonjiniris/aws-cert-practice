@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useBlocker, useNavigate, useParams } from "react-router-dom";
 import { QuestionCard } from "../components/QuestionCard";
 import { Timer } from "../components/Timer";
 import { api } from "../api";
@@ -56,7 +56,22 @@ export function ExamPage() {
   const startedAtRef = useRef<number>(Date.now());
   const startedIsoRef = useRef<string>(new Date().toISOString());
   const submittedRef = useRef(false);
-  const sentinelPushedRef = useRef(false);
+
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      !submittedRef.current &&
+      loaded != null &&
+      currentLocation.pathname !== nextLocation.pathname
+  );
+
+  useEffect(() => {
+    if (blocker.state !== "blocked") return;
+    const ok = window.confirm(
+      "Leave the exam? Your progress on this attempt will be lost."
+    );
+    if (ok) blocker.proceed();
+    else blocker.reset();
+  }, [blocker]);
 
   useEffect(() => {
     const certId = params.certId;
@@ -119,37 +134,13 @@ export function ExamPage() {
 
   useEffect(() => {
     if (!loaded) return;
-
-    if (!sentinelPushedRef.current) {
-      window.history.pushState({ examGuard: true }, "");
-      sentinelPushedRef.current = true;
-    }
-
-    const onPopState = () => {
-      if (submittedRef.current) return;
-      const ok = window.confirm(
-        "Leave the exam? Your progress on this attempt will be lost."
-      );
-      if (ok) {
-        window.removeEventListener("popstate", onPopState);
-        setTimeout(() => window.history.back(), 0);
-      } else {
-        window.history.pushState({ examGuard: true }, "");
-      }
-    };
-
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
       if (submittedRef.current) return;
       e.preventDefault();
       e.returnValue = "";
     };
-
-    window.addEventListener("popstate", onPopState);
     window.addEventListener("beforeunload", onBeforeUnload);
-    return () => {
-      window.removeEventListener("popstate", onPopState);
-      window.removeEventListener("beforeunload", onBeforeUnload);
-    };
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [loaded]);
 
   const toggleSelection = (questionId: string, optionId: string, isMulti: boolean) => {
@@ -225,12 +216,10 @@ export function ExamPage() {
         passed,
         per_domain: perDomain,
         answers,
-        question_snapshots: loaded.prepared.map((p) => p.question),
       };
 
       try {
         await api.submitAttempt(attempt);
-        sessionStorage.setItem(`attempt:${attempt.id}`, JSON.stringify(attempt));
         navigate(`/review/${attempt.id}`, { replace: true });
       } catch (e) {
         setError((e as Error).message);
@@ -333,22 +322,25 @@ export function ExamPage() {
           })}
         </div>
 
-        {currentIndex < loaded.prepared.length - 1 ? (
-          <button
-            onClick={() => setCurrentIndex((i) => Math.min(loaded.prepared.length - 1, i + 1))}
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            onClick={handleSubmit}
-            disabled={submitting}
-            className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
-          >
-            {loaded.isSpecial ? "Save & Exit" : "Submit exam"}
-          </button>
-        )}
+        <div className="flex gap-2">
+          {currentIndex < loaded.prepared.length - 1 && (
+            <button
+              onClick={() => setCurrentIndex((i) => Math.min(loaded.prepared.length - 1, i + 1))}
+              className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+            >
+              Next
+            </button>
+          )}
+          {(loaded.isSpecial || currentIndex === loaded.prepared.length - 1) && (
+            <button
+              onClick={handleSubmit}
+              disabled={submitting}
+              className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
+            >
+              {loaded.isSpecial ? "Submit" : "Submit exam"}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,9 @@
-import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
+import {
+  NavLink,
+  Outlet,
+  RouterProvider,
+  createBrowserRouter,
+} from "react-router-dom";
 import { ExamsListPage } from "./pages/ExamsListPage";
 import { ExamPage } from "./pages/ExamPage";
 import { ReviewPage } from "./pages/ReviewPage";
@@ -34,18 +39,29 @@ function Nav() {
   );
 }
 
-export function App() {
+function Layout() {
   return (
-    <BrowserRouter>
+    <>
       <Nav />
-      <Routes>
-        <Route path="/" element={<ExamsListPage />} />
-        <Route path="/exam/:certId/:version" element={<ExamPage />} />
-        <Route path="/review/:attemptId" element={<ReviewPage />} />
-        <Route path="/wrong" element={<WrongQuestionsChooserPage />} />
-        <Route path="/wrong/:certId" element={<WrongQuestionsCertPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-      </Routes>
-    </BrowserRouter>
+      <Outlet />
+    </>
   );
+}
+
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      { path: "/", element: <ExamsListPage /> },
+      { path: "/exam/:certId/:version", element: <ExamPage /> },
+      { path: "/review/:attemptId", element: <ReviewPage /> },
+      { path: "/wrong", element: <WrongQuestionsChooserPage /> },
+      { path: "/wrong/:certId", element: <WrongQuestionsCertPage /> },
+      { path: "/history", element: <HistoryPage /> },
+    ],
+  },
+]);
+
+export function App() {
+  return <RouterProvider router={router} />;
 }
