@@ -10,6 +10,7 @@ export function ReviewPage() {
   const [attempt, setAttempt] = useState<AttemptRecord | null>(null);
   const [cert, setCert] = useState<CertSpec | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [wrongOnly, setWrongOnly] = useState(false);
 
   const [questions, setQuestions] = useState<Question[]>([]);
 
@@ -108,9 +109,21 @@ export function ReviewPage() {
         </div>
       </div>
 
-      <h2 className="mb-3 text-lg font-semibold text-slate-900">Question review</h2>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-slate-900">Question review</h2>
+        <label className="flex items-center gap-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            checked={wrongOnly}
+            onChange={(e) => setWrongOnly(e.target.checked)}
+            className="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+          />
+          Show wrong only
+        </label>
+      </div>
       <ol className="space-y-4">
         {attempt.answers.map((a, idx) => {
+          if (wrongOnly && a.is_correct) return null;
           const q = byId.get(a.question_id);
           if (!q) {
             return (
