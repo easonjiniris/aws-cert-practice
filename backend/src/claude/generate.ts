@@ -6,7 +6,13 @@ import {
 } from "./schema.js";
 import { buildPerDomainPrompt } from "./prompt.js";
 import { buildSubmitQuestionsTool } from "./tool.js";
-import type { CertSpec, DomainSpec, Question, QuestionPool } from "../types.js";
+import type {
+  CertSpec,
+  DomainSpec,
+  GenerationStage,
+  Question,
+  QuestionPool,
+} from "../types.js";
 
 export class MissingApiKeyError extends Error {
   constructor() {
@@ -68,6 +74,8 @@ interface CallOpts {
   model: string;
   maxTokens: number;
   signal?: AbortSignal;
+  /** Called as questions stream in, with how many have arrived for this domain so far. */
+  onPartial?: (domainCount: number) => void;
 }
 
 async function callOnce(
@@ -82,7 +90,7 @@ async function callOnce(
   const content = extraSystem ? `${prompt}\n\n${extraSystem}` : prompt;
   const tool = buildSubmitQuestionsTool(cert);
 
-  const response = await client.messages.create(
+  const stream = client.messages.stream(
     {
       model: opts.model,
       max_tokens: opts.maxTokens,
@@ -92,6 +100,17 @@ async function callOnce(
     },
     { signal: opts.signal }
   );
+
+  if (opts.onPartial) {
+    stream.on("inputJson", (_partial, snapshot) => {
+      const questions = (snapshot as { questions?: unknown } | null)?.questions;
+      if (Array.isArray(questions)) {
+        opts.onPartial!(Math.min(questions.length, count));
+      }
+    });
+  }
+
+  const response = await stream.finalMessage();
 
   const toolBlock = response.content.find((b) => b.type === "tool_use");
   if (!toolBlock || toolBlock.type !== "tool_use") {
@@ -168,21 +187,23 @@ export interface GenerateInput {
   nextVersion: number;
   questionCount: number;
   signal?: AbortSignal;
-  /** Called with the number of domains finished so far, as each one completes. */
+  /** Called with the number of questions generated so far, as each domain completes. */
   onProgress?: (completed: number) => void;
+  /** Called when the job moves to a new phase (e.g. "validating"). */
+  onStage?: (stage: GenerationStage) => void;
 }
 
 export interface GenerateOutput {
   pool: QuestionPool;
 }
 
-/** Number of domains that will actually trigger a Claude call for the given total. */
-export function plannedDomainCount(
+/** Total number of questions that will be generated for the given target. */
+export function plannedQuestionCount(
   questionCount: number,
   domains: readonly DomainSpec[]
 ): number {
   const counts = domainCounts(questionCount, domains);
-  return domains.filter((d) => (counts[d.id] ?? 0) > 0).length;
+  return domains.reduce((sum, d) => sum + (counts[d.id] ?? 0), 0);
 }
 
 export async function generatePool(input: GenerateInput): Promise<GenerateOutput> {
@@ -193,22 +214,38 @@ export async function generatePool(input: GenerateInput): Promise<GenerateOutput
 
   const counts = domainCounts(input.questionCount, input.cert.domains);
 
-  let completed = 0;
+  const perDomain = new Map<string, number>();
+  const reportProgress = () => {
+    let sum = 0;
+    for (const n of perDomain.values()) sum += n;
+    input.onProgress?.(sum);
+  };
+
   const results = await Promise.all(
     input.cert.domains.map(async (d) => {
       const count = counts[d.id] ?? 0;
+      perDomain.set(d.id, 0);
       const arr = await generateDomainQuestions(input.cert, d, count, {
         model,
         maxTokens,
         signal: input.signal,
+        onPartial: (n) => {
+          // Keep each domain's count monotonic: a validation retry restarts the
+          // stream at 0, but every attempt targets the same count, so never let
+          // the reported total regress.
+          if (n > (perDomain.get(d.id) ?? 0)) {
+            perDomain.set(d.id, n);
+            reportProgress();
+          }
+        },
       });
-      if (count > 0) {
-        completed += 1;
-        input.onProgress?.(completed);
-      }
+      perDomain.set(d.id, arr.length);
+      reportProgress();
       return arr;
     })
   );
+
+  input.onStage?.("validating");
 
   const merged: Question[] = [];
   let idx = 1;

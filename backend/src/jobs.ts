@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { GenerationStage } from "./types.js";
 
 export type GenerationJobStatus = "running" | "done" | "error" | "cancelled";
 
@@ -14,6 +15,7 @@ export interface GenerationJob {
   cert_id: string;
   version: number;
   status: GenerationJobStatus;
+  stage: GenerationStage;
   completed: number;
   total: number;
   result: GenerationJobResult | null;
@@ -36,6 +38,7 @@ export function createJob(
     cert_id,
     version,
     status: "running",
+    stage: "generating",
     completed: 0,
     total,
     result: null,

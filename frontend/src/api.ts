@@ -54,6 +54,7 @@ export const api = {
   getGenerateJob: (jobId: string) =>
     jsonFetch<{
       status: "running" | "done" | "error" | "cancelled";
+      stage: "generating" | "validating" | "writing_pool" | "writing_exam";
       completed: number;
       total: number;
       result: {

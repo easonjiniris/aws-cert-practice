@@ -2,6 +2,13 @@ export type Difficulty = "easy" | "medium" | "hard";
 export type QuestionType = "multiple_choice" | "multiple_response";
 export type CertLevel = "foundational" | "associate" | "professional" | "specialty";
 
+/** Phases of a generation job after it starts, in order. */
+export type GenerationStage =
+  | "generating"
+  | "validating"
+  | "writing_pool"
+  | "writing_exam";
+
 export interface DomainSpec {
   id: string;
   name: string;

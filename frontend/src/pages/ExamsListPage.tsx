@@ -6,6 +6,14 @@ import { CERT_LEVEL_LABEL, CERT_LEVELS, formatTime, scoreColorScale } from "../u
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+type GenStage = "generating" | "validating" | "writing_pool" | "writing_exam";
+
+const STAGE_LABEL: Record<Exclude<GenStage, "generating">, string> = {
+  validating: "Validating questions…",
+  writing_pool: "Writing question pool…",
+  writing_exam: "Writing exam…",
+};
+
 export function ExamsListPage() {
   const [data, setData] = useState<HomeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -14,6 +22,7 @@ export function ExamsListPage() {
   const [genProgress, setGenProgress] = useState<{ completed: number; total: number } | null>(
     null
   );
+  const [genStage, setGenStage] = useState<GenStage>("generating");
   const [genJobId, setGenJobId] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [genMessage, setGenMessage] = useState<string | null>(null);
@@ -80,17 +89,23 @@ export function ExamsListPage() {
     setCancelling(false);
     setGenMessage(null);
     setGenJobId(null);
+    setGenStage("generating");
     setGenProgress({ completed: 0, total: 0 });
     try {
       const { jobId, total } = await api.startGenerate(certId);
       setGenJobId(jobId);
       setGenProgress({ completed: 0, total });
 
-      // Poll the job until it reaches a terminal state.
+      // Poll the job until it reaches a terminal state. Questions stream in,
+      // so poll fairly often and keep the bar monotonic.
       for (;;) {
-        await sleep(1000);
+        await sleep(750);
         const status = await api.getGenerateJob(jobId);
-        setGenProgress({ completed: status.completed, total: status.total });
+        setGenStage(status.stage);
+        setGenProgress((prev) => ({
+          completed: Math.max(prev?.completed ?? 0, status.completed),
+          total: status.total,
+        }));
         if (status.status === "done") {
           const r = status.result;
           setGenMessage(
@@ -116,6 +131,7 @@ export function ExamsListPage() {
       setGenerating(false);
       setGenJobId(null);
       setGenProgress(null);
+      setGenStage("generating");
       setCancelling(false);
     }
   };
@@ -175,39 +191,51 @@ export function ExamsListPage() {
 
       {generating && (
         <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3">
-          <div className="mb-2 flex items-center justify-between gap-3 text-sm">
-            <span className="text-sky-800">
-              Calling Claude across all domains in parallel — usually 30–90 seconds…
-            </span>
-            <span className="font-semibold tabular-nums text-sky-900">{genPercent}%</span>
-          </div>
-          <div
-            className="mb-3 h-2 w-full overflow-hidden rounded-full bg-sky-100"
-            role="progressbar"
-            aria-valuenow={genPercent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div
-              className="h-full rounded-full bg-sky-500 transition-[width] duration-500 ease-out"
-              style={{ width: `${genPercent}%` }}
-            />
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-xs text-sky-700">
-              {genProgress && genProgress.total > 0
-                ? `${genProgress.completed} of ${genProgress.total} domains complete`
-                : "Starting…"}
-            </span>
-            <button
-              type="button"
-              onClick={cancelGenerate}
-              disabled={!genJobId || cancelling}
-              className="rounded-md border border-sky-300 bg-white px-3 py-1.5 text-xs font-medium text-sky-700 shadow-sm hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {cancelling ? "Cancelling…" : "Cancel"}
-            </button>
-          </div>
+          {genStage === "generating" ? (
+            <>
+              <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+                <span className="text-sky-800">
+                  Calling Claude across all domains in parallel — usually 30–90 seconds…
+                </span>
+                <span className="font-semibold tabular-nums text-sky-900">{genPercent}%</span>
+              </div>
+              <div
+                className="mb-3 h-2 w-full overflow-hidden rounded-full bg-sky-100"
+                role="progressbar"
+                aria-valuenow={genPercent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <div
+                  className="h-full rounded-full bg-sky-500 transition-[width] duration-500 ease-out"
+                  style={{ width: `${genPercent}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs text-sky-700">
+                  {genProgress && genProgress.total > 0
+                    ? `${genProgress.completed} of ${genProgress.total} questions generated`
+                    : "Starting…"}
+                </span>
+                <button
+                  type="button"
+                  onClick={cancelGenerate}
+                  disabled={!genJobId || cancelling}
+                  className="rounded-md border border-sky-300 bg-white px-3 py-1.5 text-xs font-medium text-sky-700 shadow-sm hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {cancelling ? "Cancelling…" : "Cancel"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center gap-2 text-sm text-sky-800">
+              <span
+                className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-sky-300 border-t-sky-600"
+                aria-hidden="true"
+              />
+              <span>{STAGE_LABEL[genStage]}</span>
+            </div>
+          )}
         </div>
       )}
       {importing && (

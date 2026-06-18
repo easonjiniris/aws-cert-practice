@@ -4,7 +4,7 @@ import {
   GenerationFailedError,
   hasApiKey,
   MissingApiKeyError,
-  plannedDomainCount,
+  plannedQuestionCount,
 } from "../claude/generate.js";
 import { makePoolSchema } from "../claude/schema.js";
 import {
@@ -15,7 +15,7 @@ import {
 } from "../storage.js";
 import { createJob, finishJob, getJob } from "../jobs.js";
 import type { GenerationJob, GenerationJobResult } from "../jobs.js";
-import type { CertSpec, Question, QuestionPool } from "../types.js";
+import type { CertSpec, GenerationStage, Question, QuestionPool } from "../types.js";
 
 export const generateRouter = Router();
 
@@ -23,9 +23,12 @@ export const generateRouter = Router();
 async function finalizePool(
   cert: CertSpec,
   version: number,
-  pool: QuestionPool
+  pool: QuestionPool,
+  onStage?: (stage: GenerationStage) => void
 ): Promise<GenerationJobResult> {
+  onStage?.("writing_pool");
   await writePool(cert.id, version, pool);
+  onStage?.("writing_exam");
   await writeExam(cert.id, version, {
     cert_id: cert.id,
     version,
@@ -51,6 +54,10 @@ async function runGenerationJob(
   cert: CertSpec,
   questionCount: number
 ): Promise<void> {
+  const setStage = (stage: GenerationStage) => {
+    const current = getJob(job.id);
+    if (current) current.stage = stage;
+  };
   try {
     const { pool } = await generatePool({
       cert,
@@ -61,8 +68,9 @@ async function runGenerationJob(
         const current = getJob(job.id);
         if (current) current.completed = completed;
       },
+      onStage: setStage,
     });
-    const result = await finalizePool(cert, job.version, pool);
+    const result = await finalizePool(cert, job.version, pool, setStage);
     finishJob(job.id, { status: "done", result, completed: job.total });
   } catch (err) {
     if (job.controller.signal.aborted) {
@@ -162,11 +170,11 @@ generateRouter.post("/certs/:certId/generate-job", async (req, res) => {
 
   const existingVersions = await listPoolVersions(certId);
   const nextVersion = (existingVersions.at(-1) ?? 0) + 1;
-  const total = plannedDomainCount(questionCount, cert.domains);
+  const total = plannedQuestionCount(questionCount, cert.domains);
 
   const job = createJob(certId, nextVersion, total);
   console.log(
-    `[generate] job ${job.id} starting ${certId} v${nextVersion}, ${questionCount} questions across ${total} domains`
+    `[generate] job ${job.id} starting ${certId} v${nextVersion}, ${total} questions across ${cert.domains.length} domains`
   );
   void runGenerationJob(job, cert, questionCount);
 
@@ -181,6 +189,7 @@ generateRouter.get("/generate-jobs/:jobId", (req, res) => {
   }
   res.json({
     status: job.status,
+    stage: job.stage,
     completed: job.completed,
     total: job.total,
     result: job.result,
