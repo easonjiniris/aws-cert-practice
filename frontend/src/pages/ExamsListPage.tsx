@@ -4,11 +4,18 @@ import { api } from "../api";
 import type { CertHomeEntry, CertLevel, HomeResponse } from "../types";
 import { CERT_LEVEL_LABEL, CERT_LEVELS, formatTime, scoreColorScale } from "../util";
 
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
 export function ExamsListPage() {
   const [data, setData] = useState<HomeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedCertId, setSelectedCertId] = useState<string>("");
   const [generating, setGenerating] = useState(false);
+  const [genProgress, setGenProgress] = useState<{ completed: number; total: number } | null>(
+    null
+  );
+  const [genJobId, setGenJobId] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
   const [genMessage, setGenMessage] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -67,24 +74,70 @@ export function ExamsListPage() {
 
   const generate = async () => {
     if (!selectedCertId) return;
+    const certId = selectedCertId;
     setPickerOpen(false);
     setGenerating(true);
+    setCancelling(false);
     setGenMessage(null);
+    setGenJobId(null);
+    setGenProgress({ completed: 0, total: 0 });
     try {
-      const result = await api.generate(selectedCertId);
-      setGenMessage(
-        `Created ${selectedCertId.toUpperCase()} ${result.name} with ${result.question_count} questions.`
-      );
-      await reload();
+      const { jobId, total } = await api.startGenerate(certId);
+      setGenJobId(jobId);
+      setGenProgress({ completed: 0, total });
+
+      // Poll the job until it reaches a terminal state.
+      for (;;) {
+        await sleep(1000);
+        const status = await api.getGenerateJob(jobId);
+        setGenProgress({ completed: status.completed, total: status.total });
+        if (status.status === "done") {
+          const r = status.result;
+          setGenMessage(
+            r
+              ? `Created ${certId.toUpperCase()} ${r.name} with ${r.question_count} questions.`
+              : `Created ${certId.toUpperCase()} pool.`
+          );
+          await reload();
+          break;
+        }
+        if (status.status === "cancelled") {
+          setGenMessage("Generation cancelled.");
+          break;
+        }
+        if (status.status === "error") {
+          setGenMessage(`Generation failed: ${status.error ?? "unknown error"}`);
+          break;
+        }
+      }
     } catch (e) {
       setGenMessage(`Generation failed: ${(e as Error).message}`);
     } finally {
       setGenerating(false);
+      setGenJobId(null);
+      setGenProgress(null);
+      setCancelling(false);
+    }
+  };
+
+  const cancelGenerate = async () => {
+    if (!genJobId) return;
+    setCancelling(true);
+    try {
+      await api.cancelGenerate(genJobId);
+    } catch {
+      // The poll loop will surface the final job state; re-enable the button on failure.
+      setCancelling(false);
     }
   };
 
   if (error) return <div className="p-6 text-red-600">Failed to load: {error}</div>;
   if (!data) return <div className="p-6 text-slate-500">Loading…</div>;
+
+  const genPercent =
+    genProgress && genProgress.total > 0
+      ? Math.min(100, Math.round((genProgress.completed / genProgress.total) * 100))
+      : 0;
 
   return (
     <div className="mx-auto max-w-6xl p-6">
@@ -121,8 +174,40 @@ export function ExamsListPage() {
       </div>
 
       {generating && (
-        <div className="mb-4 rounded border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-800">
-          Calling Claude across all domains in parallel — usually 30–90 seconds. Hang on…
+        <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3">
+          <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+            <span className="text-sky-800">
+              Calling Claude across all domains in parallel — usually 30–90 seconds…
+            </span>
+            <span className="font-semibold tabular-nums text-sky-900">{genPercent}%</span>
+          </div>
+          <div
+            className="mb-3 h-2 w-full overflow-hidden rounded-full bg-sky-100"
+            role="progressbar"
+            aria-valuenow={genPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className="h-full rounded-full bg-sky-500 transition-[width] duration-500 ease-out"
+              style={{ width: `${genPercent}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs text-sky-700">
+              {genProgress && genProgress.total > 0
+                ? `${genProgress.completed} of ${genProgress.total} domains complete`
+                : "Starting…"}
+            </span>
+            <button
+              type="button"
+              onClick={cancelGenerate}
+              disabled={!genJobId || cancelling}
+              className="rounded-md border border-sky-300 bg-white px-3 py-1.5 text-xs font-medium text-sky-700 shadow-sm hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {cancelling ? "Cancelling…" : "Cancel"}
+            </button>
+          </div>
         </div>
       )}
       {importing && (

@@ -24,7 +24,7 @@ function Nav() {
   return (
     <nav className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex max-w-6xl items-center gap-2 px-6 py-3">
-        <span className="mr-4 text-sm font-semibold text-slate-900">AWS Cert Practice</span>
+        <span className="mr-4 text-sm font-semibold text-slate-900">AWS Exam Practice</span>
         <NavLink to="/" end className={tabClass}>
           Exams
         </NavLink>

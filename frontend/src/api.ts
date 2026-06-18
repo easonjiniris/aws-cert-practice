@@ -46,11 +46,29 @@ export const api = {
       method: "POST",
       body: JSON.stringify(attempt),
     }),
-  generate: (certId: string) =>
-    jsonFetch<{ cert_id: string; version: number; name: string; question_count: number }>(
-      `/api/certs/${certId}/generate`,
-      { method: "POST", body: JSON.stringify({}) }
-    ),
+  startGenerate: (certId: string) =>
+    jsonFetch<{ jobId: string; total: number }>(`/api/certs/${certId}/generate-job`, {
+      method: "POST",
+      body: JSON.stringify({}),
+    }),
+  getGenerateJob: (jobId: string) =>
+    jsonFetch<{
+      status: "running" | "done" | "error" | "cancelled";
+      completed: number;
+      total: number;
+      result: {
+        cert_id: string;
+        version: number;
+        name: string;
+        question_count: number;
+      } | null;
+      error: string | null;
+    }>(`/api/generate-jobs/${jobId}`),
+  cancelGenerate: (jobId: string) =>
+    jsonFetch<{ ok: true; status: string }>(`/api/generate-jobs/${jobId}/cancel`, {
+      method: "POST",
+      body: JSON.stringify({}),
+    }),
   importPool: (pool: unknown) =>
     jsonFetch<{ cert_id: string; version: number; name: string; question_count: number }>(
       `/api/certs/import`,

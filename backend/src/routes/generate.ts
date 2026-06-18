@@ -2,7 +2,9 @@ import { Router } from "express";
 import {
   generatePool,
   GenerationFailedError,
+  hasApiKey,
   MissingApiKeyError,
+  plannedDomainCount,
 } from "../claude/generate.js";
 import { makePoolSchema } from "../claude/schema.js";
 import {
@@ -11,9 +13,76 @@ import {
   writeExam,
   writePool,
 } from "../storage.js";
-import type { Question, QuestionPool } from "../types.js";
+import { createJob, finishJob, getJob } from "../jobs.js";
+import type { GenerationJob, GenerationJobResult } from "../jobs.js";
+import type { CertSpec, Question, QuestionPool } from "../types.js";
 
 export const generateRouter = Router();
+
+/** Persist a generated/imported pool plus its exam definition, and return a summary. */
+async function finalizePool(
+  cert: CertSpec,
+  version: number,
+  pool: QuestionPool
+): Promise<GenerationJobResult> {
+  await writePool(cert.id, version, pool);
+  await writeExam(cert.id, version, {
+    cert_id: cert.id,
+    version,
+    name: `exam_v${version}`,
+    pool_ref: `question_pool_v${version}.json`,
+    question_count: pool.questions.length,
+    time_limit_seconds: cert.time_limit_seconds,
+    pass_score: cert.pass_score,
+    shuffle_options: true,
+    created_at: new Date().toISOString(),
+  });
+  return {
+    cert_id: cert.id,
+    version,
+    name: `exam_v${version}`,
+    question_count: pool.questions.length,
+  };
+}
+
+/** Run generation in the background, updating the job as domains complete. */
+async function runGenerationJob(
+  job: GenerationJob,
+  cert: CertSpec,
+  questionCount: number
+): Promise<void> {
+  try {
+    const { pool } = await generatePool({
+      cert,
+      nextVersion: job.version,
+      questionCount,
+      signal: job.controller.signal,
+      onProgress: (completed) => {
+        const current = getJob(job.id);
+        if (current) current.completed = completed;
+      },
+    });
+    const result = await finalizePool(cert, job.version, pool);
+    finishJob(job.id, { status: "done", result, completed: job.total });
+  } catch (err) {
+    if (job.controller.signal.aborted) {
+      finishJob(job.id, { status: "cancelled" });
+      return;
+    }
+    let message = (err as Error).message;
+    const apiErr = err as { status?: number; message: string };
+    if (
+      !(err instanceof MissingApiKeyError) &&
+      !(err instanceof GenerationFailedError) &&
+      typeof apiErr.status === "number" &&
+      apiErr.status >= 400
+    ) {
+      message = `Anthropic API error (${apiErr.status}): ${apiErr.message}`;
+    }
+    console.error(`[generate] job ${job.id} failed`, err);
+    finishJob(job.id, { status: "error", error: message });
+  }
+}
 
 generateRouter.post("/certs/import", async (req, res) => {
   const pool = req.body?.pool;
@@ -68,94 +137,63 @@ generateRouter.post("/certs/import", async (req, res) => {
   }
 
   const validated = parsed.data as QuestionPool;
-  await writePool(certId, nextVersion, validated);
-  await writeExam(certId, nextVersion, {
-    cert_id: certId,
-    version: nextVersion,
-    name: `exam_v${nextVersion}`,
-    pool_ref: `question_pool_v${nextVersion}.json`,
-    question_count: validated.questions.length,
-    time_limit_seconds: cert.time_limit_seconds,
-    pass_score: cert.pass_score,
-    shuffle_options: true,
-    created_at: new Date().toISOString(),
-  });
+  const result = await finalizePool(cert, nextVersion, validated);
+  res.json(result);
+});
 
+// Start a generation job. Returns immediately with a job id; generation runs
+// in the background and progress is polled via GET /generate-jobs/:jobId.
+generateRouter.post("/certs/:certId/generate-job", async (req, res) => {
+  const certId = req.params.certId;
+  const cert = await loadCert(certId);
+  if (!cert) {
+    res.status(404).json({ error: `cert not found: ${certId}` });
+    return;
+  }
+  if (!hasApiKey()) {
+    res.status(400).json({ error: "ANTHROPIC_API_KEY not set", code: "missing_key" });
+    return;
+  }
+
+  const questionCount =
+    typeof req.body?.question_count === "number"
+      ? req.body.question_count
+      : cert.question_count;
+
+  const existingVersions = await listPoolVersions(certId);
+  const nextVersion = (existingVersions.at(-1) ?? 0) + 1;
+  const total = plannedDomainCount(questionCount, cert.domains);
+
+  const job = createJob(certId, nextVersion, total);
+  console.log(
+    `[generate] job ${job.id} starting ${certId} v${nextVersion}, ${questionCount} questions across ${total} domains`
+  );
+  void runGenerationJob(job, cert, questionCount);
+
+  res.json({ jobId: job.id, total });
+});
+
+generateRouter.get("/generate-jobs/:jobId", (req, res) => {
+  const job = getJob(req.params.jobId);
+  if (!job) {
+    res.status(404).json({ error: "job not found" });
+    return;
+  }
   res.json({
-    cert_id: certId,
-    version: nextVersion,
-    name: `exam_v${nextVersion}`,
-    question_count: validated.questions.length,
+    status: job.status,
+    completed: job.completed,
+    total: job.total,
+    result: job.result,
+    error: job.error,
   });
 });
 
-generateRouter.post("/certs/:certId/generate", async (req, res) => {
-  const certId = req.params.certId;
-  try {
-    const cert = await loadCert(certId);
-    if (!cert) {
-      res.status(404).json({ error: `cert not found: ${certId}` });
-      return;
-    }
-
-    const questionCount =
-      typeof req.body?.question_count === "number"
-        ? req.body.question_count
-        : cert.question_count;
-
-    const existingVersions = await listPoolVersions(certId);
-    const nextVersion = (existingVersions.at(-1) ?? 0) + 1;
-
-    console.log(`[generate] starting ${certId} v${nextVersion}, ${questionCount} questions`);
-    const startedAt = Date.now();
-    const { pool } = await generatePool({ cert, nextVersion, questionCount });
-    console.log(
-      `[generate] got ${pool.questions.length} questions in ${Math.round(
-        (Date.now() - startedAt) / 1000
-      )}s — writing files`
-    );
-
-    await writePool(certId, nextVersion, pool);
-    await writeExam(certId, nextVersion, {
-      cert_id: certId,
-      version: nextVersion,
-      name: `exam_v${nextVersion}`,
-      pool_ref: `question_pool_v${nextVersion}.json`,
-      question_count: pool.questions.length,
-      time_limit_seconds: cert.time_limit_seconds,
-      pass_score: cert.pass_score,
-      shuffle_options: true,
-      created_at: new Date().toISOString(),
-    });
-
-    res.json({
-      cert_id: certId,
-      version: nextVersion,
-      name: `exam_v${nextVersion}`,
-      question_count: pool.questions.length,
-    });
-  } catch (err) {
-    if (err instanceof MissingApiKeyError) {
-      res.status(400).json({ error: err.message, code: "missing_key" });
-      return;
-    }
-    if (err instanceof GenerationFailedError) {
-      res.status(502).json({
-        error: err.message,
-        code: "generation_failed",
-        domain: err.domain,
-      });
-      return;
-    }
-    const apiErr = err as { status?: number; message: string };
-    if (typeof apiErr.status === "number" && apiErr.status >= 400) {
-      res.status(502).json({
-        error: `Anthropic API error (${apiErr.status}): ${apiErr.message}`,
-        code: "upstream_error",
-      });
-      return;
-    }
-    console.error("[generate] unexpected error", err);
-    res.status(500).json({ error: (err as Error).message });
+generateRouter.post("/generate-jobs/:jobId/cancel", (req, res) => {
+  const job = getJob(req.params.jobId);
+  if (!job) {
+    res.status(404).json({ error: "job not found" });
+    return;
   }
+  if (job.status === "running") job.controller.abort();
+  res.json({ ok: true, status: job.status });
 });

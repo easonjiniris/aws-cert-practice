@@ -22,6 +22,13 @@ export class GenerationFailedError extends Error {
   }
 }
 
+export class GenerationCancelledError extends Error {
+  constructor() {
+    super("generation cancelled");
+    this.name = "GenerationCancelledError";
+  }
+}
+
 let cachedClient: Anthropic | null = null;
 function getClient(): Anthropic {
   if (cachedClient) return cachedClient;
@@ -29,6 +36,11 @@ function getClient(): Anthropic {
   if (!key || key.trim().length === 0) throw new MissingApiKeyError();
   cachedClient = new Anthropic({ apiKey: key });
   return cachedClient;
+}
+
+export function hasApiKey(): boolean {
+  const key = process.env.ANTHROPIC_API_KEY;
+  return !!key && key.trim().length > 0;
 }
 
 export function domainCounts(
@@ -55,6 +67,7 @@ export function domainCounts(
 interface CallOpts {
   model: string;
   maxTokens: number;
+  signal?: AbortSignal;
 }
 
 async function callOnce(
@@ -69,13 +82,16 @@ async function callOnce(
   const content = extraSystem ? `${prompt}\n\n${extraSystem}` : prompt;
   const tool = buildSubmitQuestionsTool(cert);
 
-  const response = await client.messages.create({
-    model: opts.model,
-    max_tokens: opts.maxTokens,
-    tools: [tool],
-    tool_choice: { type: "tool", name: tool.name },
-    messages: [{ role: "user", content }],
-  });
+  const response = await client.messages.create(
+    {
+      model: opts.model,
+      max_tokens: opts.maxTokens,
+      tools: [tool],
+      tool_choice: { type: "tool", name: tool.name },
+      messages: [{ role: "user", content }],
+    },
+    { signal: opts.signal }
+  );
 
   const toolBlock = response.content.find((b) => b.type === "tool_use");
   if (!toolBlock || toolBlock.type !== "tool_use") {
@@ -98,6 +114,7 @@ export async function generateDomainQuestions(
   const schema = makeQuestionsArraySchema(cert);
   let lastError: string | null = null;
   for (let attempt = 0; attempt < 2; attempt++) {
+    if (opts.signal?.aborted) throw new GenerationCancelledError();
     const extra =
       attempt === 0
         ? ""
@@ -132,6 +149,9 @@ export async function generateDomainQuestions(
       }
       return parsed.data;
     } catch (err) {
+      if (opts.signal?.aborted || err instanceof GenerationCancelledError) {
+        throw new GenerationCancelledError();
+      }
       if (err instanceof MissingApiKeyError) throw err;
       if (err instanceof GenerationFailedError) throw err;
       lastError = (err as Error).message;
@@ -147,10 +167,22 @@ export interface GenerateInput {
   cert: CertSpec;
   nextVersion: number;
   questionCount: number;
+  signal?: AbortSignal;
+  /** Called with the number of domains finished so far, as each one completes. */
+  onProgress?: (completed: number) => void;
 }
 
 export interface GenerateOutput {
   pool: QuestionPool;
+}
+
+/** Number of domains that will actually trigger a Claude call for the given total. */
+export function plannedDomainCount(
+  questionCount: number,
+  domains: readonly DomainSpec[]
+): number {
+  const counts = domainCounts(questionCount, domains);
+  return domains.filter((d) => (counts[d.id] ?? 0) > 0).length;
 }
 
 export async function generatePool(input: GenerateInput): Promise<GenerateOutput> {
@@ -161,10 +193,21 @@ export async function generatePool(input: GenerateInput): Promise<GenerateOutput
 
   const counts = domainCounts(input.questionCount, input.cert.domains);
 
+  let completed = 0;
   const results = await Promise.all(
-    input.cert.domains.map((d) =>
-      generateDomainQuestions(input.cert, d, counts[d.id] ?? 0, { model, maxTokens })
-    )
+    input.cert.domains.map(async (d) => {
+      const count = counts[d.id] ?? 0;
+      const arr = await generateDomainQuestions(input.cert, d, count, {
+        model,
+        maxTokens,
+        signal: input.signal,
+      });
+      if (count > 0) {
+        completed += 1;
+        input.onProgress?.(completed);
+      }
+      return arr;
+    })
   );
 
   const merged: Question[] = [];
