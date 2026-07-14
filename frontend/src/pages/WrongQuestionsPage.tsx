@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import { DifficultyBadge, DomainBadge } from "../components/DomainBadge";
 import type { CertSpec, HomeResponse, WrongQuestionEntry } from "../types";
-import { CERT_LEVEL_LABEL, CERT_LEVELS, domainName } from "../util";
+import { CERT_LEVEL_LABEL, CERT_LEVELS, domainName, domainPalette } from "../util";
 
 export function WrongQuestionsChooserPage() {
   const [data, setData] = useState<HomeResponse | null>(null);
@@ -140,6 +140,8 @@ export function WrongQuestionsCertPage() {
         )}
       </div>
 
+      {entries.length > 0 && <WrongTopicChart cert={cert} entries={entries} />}
+
       <div className="mb-4 flex flex-wrap gap-3">
         <input
           type="search"
@@ -237,6 +239,80 @@ export function WrongQuestionsCertPage() {
           })}
         </ul>
       )}
+    </div>
+  );
+}
+
+/**
+ * Horizontal stacked bar: the share of wrong questions belonging to each topic
+ * (domain), each segment coloured with the topic's assigned palette colour.
+ */
+function WrongTopicChart({
+  cert,
+  entries,
+}: {
+  cert: CertSpec;
+  entries: WrongQuestionEntry[];
+}) {
+  const total = entries.length;
+
+  const segments = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const e of entries) {
+      counts.set(e.snapshot.domain, (counts.get(e.snapshot.domain) ?? 0) + 1);
+    }
+    // Cert domains first (canonical order), then any stray ids not in the spec.
+    const ids = [
+      ...cert.domains.map((d) => d.id),
+      ...[...counts.keys()].filter((id) => !cert.domains.some((d) => d.id === id)),
+    ];
+    return ids
+      .map((id) => ({
+        id,
+        name: domainName(cert, id),
+        count: counts.get(id) ?? 0,
+        palette: domainPalette(id),
+      }))
+      .filter((s) => s.count > 0)
+      .sort((a, b) => b.count - a.count);
+  }, [cert, entries]);
+
+  if (total === 0) return null;
+
+  const pct = (n: number) => Math.round((n / total) * 100);
+
+  return (
+    <div className="mb-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-3 flex items-baseline justify-between">
+        <h2 className="text-sm font-semibold text-slate-900">Weak spots by topic</h2>
+        <span className="text-xs text-slate-500">
+          {total} wrong question{total === 1 ? "" : "s"}
+        </span>
+      </div>
+
+      <div className="flex h-3 w-full gap-0.5" role="img" aria-label="Wrong questions by topic">
+        {segments.map((s, i) => (
+          <div
+            key={s.id}
+            className={`h-full ${s.palette.bar} ${i === 0 ? "rounded-l-full" : ""} ${
+              i === segments.length - 1 ? "rounded-r-full" : ""
+            }`}
+            style={{ flexGrow: s.count, flexBasis: 0 }}
+            title={`${s.name}: ${s.count} (${pct(s.count)}%)`}
+          />
+        ))}
+      </div>
+
+      <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-2">
+        {segments.map((s) => (
+          <li key={s.id} className="flex items-center gap-1.5 text-xs">
+            <DomainBadge id={s.id} label={s.name} />
+            <span className="text-slate-400">
+              {s.count} · {pct(s.count)}%
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

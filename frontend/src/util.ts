@@ -43,15 +43,25 @@ export function domainName(cert: CertSpec, domainId: string): string {
   return cert.domains.find((d) => d.id === domainId)?.name ?? domainId;
 }
 
-const PALETTE = [
-  "bg-sky-100 text-sky-800 border-sky-200",
-  "bg-rose-100 text-rose-800 border-rose-200",
-  "bg-violet-100 text-violet-800 border-violet-200",
-  "bg-amber-100 text-amber-800 border-amber-200",
-  "bg-emerald-100 text-emerald-800 border-emerald-200",
-  "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200",
-  "bg-teal-100 text-teal-800 border-teal-200",
-  "bg-indigo-100 text-indigo-800 border-indigo-200",
+export interface DomainPalette {
+  /** Badge classes: pale background + dark text + border. */
+  badge: string;
+  /** Solid fill for chart marks (bar segments, legend swatches). */
+  bar: string;
+}
+
+// Each entry is one hue family. `badge` is the soft variant used by DomainBadge;
+// `bar` is the saturated fill used for chart segments so a topic reads as the
+// same colour in its badge and in the chart.
+const PALETTE: DomainPalette[] = [
+  { badge: "bg-sky-100 text-sky-800 border-sky-200", bar: "bg-sky-500" },
+  { badge: "bg-rose-100 text-rose-800 border-rose-200", bar: "bg-rose-500" },
+  { badge: "bg-violet-100 text-violet-800 border-violet-200", bar: "bg-violet-500" },
+  { badge: "bg-amber-100 text-amber-800 border-amber-200", bar: "bg-amber-500" },
+  { badge: "bg-emerald-100 text-emerald-800 border-emerald-200", bar: "bg-emerald-500" },
+  { badge: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200", bar: "bg-fuchsia-500" },
+  { badge: "bg-teal-100 text-teal-800 border-teal-200", bar: "bg-teal-500" },
+  { badge: "bg-indigo-100 text-indigo-800 border-indigo-200", bar: "bg-indigo-500" },
 ];
 
 function hash(s: string): number {
@@ -60,8 +70,13 @@ function hash(s: string): number {
   return Math.abs(h);
 }
 
-export function domainColor(domainId: string): string {
+// Stable per-domain colour: the same domain id always maps to the same hue.
+export function domainPalette(domainId: string): DomainPalette {
   return PALETTE[hash(domainId) % PALETTE.length];
+}
+
+export function domainColor(domainId: string): string {
+  return domainPalette(domainId).badge;
 }
 
 export type ScoreColors = { container: string; title: string; pct: string };
